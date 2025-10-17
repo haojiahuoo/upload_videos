@@ -12,16 +12,14 @@ def upload_to_douyin(video_path, title, description, tags, username, password):
     driver = webdriver.Chrome()
 
     try:
-        # Navigate to Douyin login page
-        driver.get("https://www.douyin.com/login")
+        # 登录网站
+        driver.get("https://creator.douyin.com/creator-micro/content/upload?enter_from=dou_web")
 
-        # Log in to Douyin
-        username_field = wait_for_element(driver, By.NAME, "username")
-        password_field = driver.find_element(By.NAME, "password")
-        login_button = driver.find_element(By.XPATH, "//button[text()='Log In']")
-
-        username_field.send_keys(username)
-        password_field.send_keys(password)
+        # 点击登录按钮
+        wait_for_element(driver, By.XPATH, "//span[@text='密码登录']").click()
+        wait_for_element(driver, By.XPATH, "//div[@class='douyin_login_comp_normal_input-ft2LbF']").send_keys("13869586968")
+        wait_for_element(driver, By.XPATH, "//div[@class='input-XjvQLQ']").send_keys("libin123")
+        login_button = wait_for_element(driver, By.XPATH, "//div[@class='douyin_login_comp_btn-S_beyL content-JgElQ7 primary-rpXI7f disabled-xlNs7G ']")
         login_button.click()
 
         # Wait for login to complete (this may require more sophisticated handling)
