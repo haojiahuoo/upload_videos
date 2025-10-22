@@ -6,12 +6,11 @@ def download_video(platform, play_url, list=True):
         print(f"🎉 {platform}: 开始工作")
         youtube_playlist_url(play_url)
         
+
     elif platform == "youtube" and list == False:
         print(f"🎉 {platform}开始下载单个视频")
         youtube_video_url(play_url)
         
-
-
 # 主程序入口
 # =======================
 if __name__ == "__main__":
