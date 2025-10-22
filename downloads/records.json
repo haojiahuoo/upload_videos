@@ -1,0 +1,18 @@
+{
+    "youtube": {
+        "download": {
+            "videos": {
+                "https://www.youtube.com/watch?v=9ebyooYKBRg": "downloads\\temp_01.mp4"
+            },
+            "subtitles": {},
+            "descriptions": {},
+            "covers": {}
+        },
+        "upload": {
+            "videos": {},
+            "subtitles": {},
+            "descriptions": {},
+            "covers": {}
+        }
+    }
+}
