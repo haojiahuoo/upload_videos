@@ -8,7 +8,7 @@ def download_video(platform, play_url, list=True):
         
 
     elif platform == "youtube" and list == False:
-        print(f"🎉 {platform}开始下载单个视频")
+        print(f"🎉 {platform}: 开始工作")
         youtube_video_url(play_url)
         
 # 主程序入口

@@ -2,14 +2,27 @@
     "youtube": {
         "download": {
             "videos": {
-                "https://www.youtube.com/watch?v=9ebyooYKBRg": "downloads\\temp_01.mp4"
+                "https://www.youtube.com/watch?v=9ebyooYKBRg": "E:\\Videos\\temp_01.mp4",
+                "https://www.youtube.com/watch?v=rMmwC-qxnEI": "E:\\Videos\\temp_02.mp4",
+                "https://www.youtube.com/watch?v=hczX9Q67Ov0": "E:\\Videos\\temp_03.mp4",
+                "https://www.youtube.com/watch?v=kLWsBZ9wxGc": "E:\\Videos\\temp_04.mp4",
+                "https://www.youtube.com/watch?v=XiEKKHJPk3E": "E:\\Videos\\temp_05.mp4",
+                "https://www.youtube.com/watch?v=M1hEpoNF0IU": "E:\\Videos\\temp_06.mp4",
+                "https://www.youtube.com/watch?v=iv0BnckGu5I": "E:\\Videos\\temp_07.mp4",
+                "https://www.youtube.com/watch?v=_92XrAyFzJs": "E:\\Videos\\temp_08.mp4",
+                "https://www.youtube.com/watch?v=e5Xt7HhiTXc": "E:\\Videos\\temp_09.mp4",
+                "https://www.youtube.com/watch?v=FpRi0llPxKU": "E:\\Videos\\temp_10.mp4",
+                "https://www.youtube.com/watch?v=Im2l_uvE1fE": "E:\\Videos\\temp_11.mp4",
+                "https://www.youtube.com/watch?v=GU4fUPpqnik": "E:\\Videos\\temp_12.mp4",
+                "https://www.youtube.com/watch?v=avCkexhBZTQ": "E:\\Videos\\temp_13.mp4",
+                "https://www.youtube.com/watch?v=m5Yiem8_wxs": "E:\\Videos\\temp_14.mp4",
+                "https://www.youtube.com/watch?v=aMQl9WJ3zdQ": "E:\\Videos\\temp_15.mp4",
+                "https://www.youtube.com/watch?v=FwptS7ZwReM": "E:\\Videos\\temp_16.mp4",
+                "https://www.youtube.com/watch?v=yC0VF3NbVVk": "E:\\Videos\\temp_17.mp4",
+                "https://www.youtube.com/watch?v=F3mbre3RFfY": "E:\\Videos\\temp_18.mp4",
+                "https://www.youtube.com/watch?v=y82c8R6z0fI": "E:\\Videos\\temp_19.mp4",
+                "https://www.youtube.com/watch?v=5nV9UldEB_I": "E:\\Videos\\temp_20.mp4"
             },
-            "subtitles": {},
-            "descriptions": {},
-            "covers": {}
-        },
-        "upload": {
-            "videos": {},
             "subtitles": {},
             "descriptions": {},
             "covers": {}

@@ -1,38 +1,48 @@
-from config import MAX_SEGMENT_DURATION
+from config import MAX_SEGMENT_DURATION, DOWNLOAD_ROOT
 import os, subprocess, math
-from download.youtube import download_root
 
 def segment_video(full_video_path, title_cn, duration, index=1):
-    # 下载完成后分段
+    """将视频分段保存为多个文件"""
     num_parts = math.ceil(duration / MAX_SEGMENT_DURATION)
     part_len = duration / num_parts
     all_parts_exist = True
+
+    full_video_path = str(full_video_path).replace("\\", "/")
+
     for i in range(num_parts):
-        start = int(i * part_len)
-        end = int(min(duration, (i + 1) * part_len))
+        start = round(i * part_len, 2)
+        end = round(min(duration, (i + 1) * part_len), 2)
         part_name = f"({index:02}-{i+1}){title_cn}.mp4"
-        part_path = os.path.join(download_root, part_name)
+        part_path = os.path.join(DOWNLOAD_ROOT, part_name)
+        part_path = str(part_path).replace("\\", "/")
+
         ffmpeg_cmd = [
             "ffmpeg",
             "-y",
-            "-i", full_video_path,
             "-ss", str(start),
             "-to", str(end),
+            "-i", full_video_path,
             "-c", "copy",
             part_path
         ]
+
         print(f"▶️ 分段第 {i + 1}/{num_parts} ({start}-{end}s): {part_path}")
-        subprocess.run(ffmpeg_cmd)
-        
-        # 检查该段文件是否生成且大小大于 0
-        if not os.path.exists(part_path) or os.path.getsize(part_path) == 0:
+        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+
+        # 检查生成结果
+        if result.returncode != 0 or not os.path.exists(part_path) or os.path.getsize(part_path) == 0:
             all_parts_exist = False
             print(f"❌ 分段 {i+1} 生成失败: {part_path}")
+        else:
+            print(f"✅ 分段 {i+1} 成功: {part_path}")
 
-    # 如果所有分段都生成成功，删除原视频
-    if all_parts_exist and os.path.exists(full_video_path):
+    # 返回分段结果
+    if all_parts_exist:
+        print(f"🗑️ 所有分段成功生成，删除原视频：{full_video_path}")
         os.remove(full_video_path)
-        print(f"🗑️ 原始完整视频已删除: {full_video_path}")
-    elif not all_parts_exist:
+    else:
         print("⚠️ 有分段未成功生成，原视频保留。")
+
+    return all_parts_exist
+
         

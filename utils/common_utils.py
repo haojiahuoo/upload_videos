@@ -27,13 +27,13 @@ def contains_chinese(text):
     """判断文本是否包含中文字符"""
     return any('\u4e00' <= c <= '\u9fff' for c in text)
 
-def record_download(video_url, full_video_path, category="videos", platform="youtube", mode="download"):
+def record_download(key, value, category, platform, mode):
     """
     记录下载或上传的文件信息（JSON格式）
     参数:
         video_url: 视频链接
         full_video_path: 本地文件路径
-        category: "videos" | "subtitles" | "descriptions" | "covers"
+        category: "videos" | "subtitles" 字幕| "convert_vtt_ass" vtt转ass| "covers"
         platform: "youtube"（可扩展为bilibili、tiktok等）
         mode: "download" 或 "upload"
     """
@@ -41,8 +41,8 @@ def record_download(video_url, full_video_path, category="videos", platform="you
     # 如果文件不存在，初始化结构
     if not os.path.exists(record_file):
         data = {
-           platform: {
-                mode: {category: {}, "subtitles": {}, "descriptions": {}, "covers": {}},
+            platform: {
+                mode: {"videos": {}, "subtitles": {}, "convert_vtt_ass": {}, "covers": {}},
             }
         }
     else:
@@ -52,9 +52,8 @@ def record_download(video_url, full_video_path, category="videos", platform="you
             except json.JSONDecodeError:
                 # 如果文件损坏或为空，重新初始化
                 data = {
-                    "youtube": {
-                        "download": {"videos": {}, "subtitles": {}, "descriptions": {}, "covers": {}},
-                        "upload": {"videos": {}, "subtitles": {}, "descriptions": {}, "covers": {}}
+                    platform: {
+                            mode: {"videos": {}, "subtitles": {}, "dconvert_vtt_ass": {}, "covers": {}},
                     }
                 }
 
@@ -64,14 +63,14 @@ def record_download(video_url, full_video_path, category="videos", platform="you
     data[platform][mode].setdefault(category, {})
 
     # 写入记录（以 video_url 为 key）
-    data[platform][mode][category][video_url] = full_video_path
+    data[platform][mode][category][key] = value
 
     # 保存 JSON 文件（格式化输出）
     os.makedirs(download_root, exist_ok=True)
     with open(record_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-    print(f"✅ 已记录 {platform}/{mode}/{category}: {video_url} -> {full_video_path}")
+    print(f"✅ 已记录 {platform}/{mode}/{category}: {key} -> {value}")
 
 
 def get_record(video_url, platform="youtube"):

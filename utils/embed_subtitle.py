@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess 
 import os
+from utils.common_utils import *
 
 def embed_subtitle(video_path, ass_path):
     # FFmpeg 嵌入字幕
@@ -31,6 +32,13 @@ def embed_subtitle(video_path, ass_path):
         return False
 
     os.replace(tmp_path, video_path)
+    record_download(
+        video_path, 
+        True, 
+        category="embed_subtitle", 
+        platform="youtube", 
+        mode="download"
+    )
     print("✅ 字幕嵌入完成")
     
     return video_path

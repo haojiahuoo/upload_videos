@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+from utils.common_utils import *
 
 def convert_vtt_ass(temp_video_path, vtt_path, font_name="SimHei", font_size=60,
                 primary_color="&HFFFFFF&", outline_color="&H000000&", shadow=0):
@@ -60,5 +61,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f.write(ass_header)
         f.write("\n".join(dialogue_lines))
 
+    record_download(
+        ass_path, 
+        True, 
+        category="dconvert_vtt_ass", 
+        platform="youtube", 
+        mode="download"
+    )
     print(f"✅ 已生成 ASS 字幕: {ass_path}")
     return ass_path

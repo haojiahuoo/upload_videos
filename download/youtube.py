@@ -12,7 +12,7 @@ from utils.embed_subtitle import *
 from utils.segment_video import segment_video
 from config import COOKIES_BROWSER, MAX_SEGMENT_DURATION, DOWNLOAD_ROOT
 
-def chinese_title(title, video_path):
+def chinese_title(title, video_path, index=1):
     # 判断标题是否含中文
     if contains_chinese(title):
         title_cn = title
@@ -22,7 +22,8 @@ def chinese_title(title, video_path):
 
     # 重命名视频文件为 title
     video_file = Path(video_path)
-    new_video_path = video_file.with_name(f"{title_cn}{video_file.suffix}")
+    new_video_path = video_file.with_name(f"({index:02}){title_cn}{video_file.suffix}")
+    
     os.rename(video_path, new_video_path)  # 重命名文件
     print(f"🎬 视频文件已重命名为: {new_video_path.name}")
     
@@ -87,7 +88,7 @@ def download_video(video_url, zh_available, index=1):
     ]
 
     if zh_available:
-        cmd += ["--embed-subs", "--sub-langs", "zh-Hans,zh,zh-Hant", "--sub-format", "ass,vtt"]
+        cmd += ["--sub-langs", "zh-Hans,zh,zh-Hant", "--sub-format", "ass,vtt"]
         is_english_sub = False
     else:
         cmd += ["--sub-langs", "en,en-US", "--sub-format", "ass,vtt"]
@@ -131,8 +132,22 @@ def download_video(video_url, zh_available, index=1):
             print(f"🌍 检测到英文字幕，开始翻译：{subs_path}")
             if subs_path.endswith(".vtt"):
                 subs_path = translate_vtt_file(subs_path, batch_size=10)
+                record_download(
+                    subs_path, 
+                    {"status": True, "lang": "zh", "format": "vtt"}, 
+                    category="subtitles", 
+                    platform="youtube", 
+                    mode="download"
+                )
             elif subs_path.endswith(".ass"):
                 subs_path = translate_ass_file(subs_path)  # 需要你实现的 ASS 翻译函数
+                record_download(
+                    subs_path, 
+                    {"status": True, "lang": "zh", "format": "ass"}, 
+                    category="subtitles", 
+                    platform="youtube", 
+                    mode="download"
+                )
             print(f"✅ 翻译完成：{subs_path}")
         else:
             print(f"检测到中文字幕，跳过翻译。")
@@ -154,36 +169,51 @@ def get_playlist_video_urls(playlist_url):
     urls = [entry["url"] for entry in entries]
     return urls
 
+def process_video(video_url, index=1):
+    """处理单个视频的下载、字幕、嵌入、分段和记录"""
+    try:
+        print(f"\n▶️ 正在处理第 {index} 个视频：{video_url}")
+        has_zh_subs, title, duration = get_video_info(video_url)
+
+        # 下载视频和字幕
+        temp_video_path, subs_path = download_video(video_url, has_zh_subs, index)
+        ass_path = convert_vtt_ass(temp_video_path, subs_path)
+        temp_video_path = embed_subtitle(temp_video_path, ass_path)
+
+        # 生成中文标题和最终路径
+        video_path, title_cn = chinese_title(title, temp_video_path, index)
+        record_download(video_url, video_path, category="videos", platform="youtube", mode="download")
+
+        # 如果视频太长则分段
+        if duration > MAX_SEGMENT_DURATION:
+            segment_video(video_path, title_cn, duration, index)
+
+        print(f"✅ 第 {index} 个视频下载完成：{title_cn}")
+        return True
+
+    except Exception as e:
+        print(f"❌ 第 {index} 个视频下载失败：{video_url}\n错误原因：{e}")
+        return False
+
+
 def youtube_playlist_url(playlist_url):
     """下载播放列表中的所有视频"""
-    
     print("🚀 开始批量下载播放列表...")
     video_urls = get_playlist_video_urls(playlist_url)
     print(f"共检测到 {len(video_urls)} 个视频。")
 
+    success = 0
     for idx, video_url in enumerate(video_urls, start=1):
-        print(f"\n▶️ 正在下载第 {idx}/{len(video_urls)} 个视频：{video_url}")
-        has_zh_subs, title, duration = get_video_info(video_url)  # 获取视频信息
-        temp_video_path, subs_path = download_video(video_url, has_zh_subs, idx)
-        ass_path = convert_vtt_ass(temp_video_path, subs_path)
-        temp_video_path = embed_subtitle(temp_video_path, ass_path)
-        video_path, title_cn = chinese_title(title, temp_video_path)
-        if duration > MAX_SEGMENT_DURATION: 
-            segment_video(video_path, title_cn, duration, idx)
+        if process_video(video_url, idx):
+            success += 1
 
-    print("\n✅ 所有视频下载完成！")
+    print(f"\n✅ 批量下载完成！成功 {success}/{len(video_urls)} 个视频。")
 
-    
+
 def youtube_video_url(video_url):
     """下载单个视频"""
     print("🚀 开始下载单个视频...")
-    has_zh_subs, title, duration = get_video_info(video_url)  # 获取视频信息
-    temp_video_path, subs_path = download_video(video_url, has_zh_subs)
-    ass_path = convert_vtt_ass(temp_video_path, subs_path)
-    temp_video_path = embed_subtitle(temp_video_path, ass_path)
-    video_path, title_cn = chinese_title(title, temp_video_path)
-    if duration > MAX_SEGMENT_DURATION: 
-        segment_video(video_path, title_cn, duration)
-        
+    process_video(video_url)
     print("\n✅ 视频下载完成！")
+
     
