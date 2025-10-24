@@ -1,4 +1,8 @@
 # main.py
+# --- download.py 顶部添加 ---
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 from upload.douyin import DouyinUploader
 from upload.kuaishou import KuaishouUploader
 from upload.bibi import BibiUploader
@@ -6,6 +10,7 @@ import os
 from pathlib import Path
 import time
 import threading
+from config import DOWNLOAD_ROOT
 
 def list_video_files(directory):
     """列出目录中的所有视频文件"""
@@ -158,7 +163,7 @@ def upload_single_platform(platform_choice, video_files):
 
 def upload_sequential():
     """顺序上传到所有平台（一个平台完成后开始下一个）"""
-    folder_path = r"E:\\Videos\\NA"
+    folder_path = DOWNLOAD_ROOT
     if not os.path.exists(folder_path):
         print(f"❌ 目录不存在: {folder_path}")
         return
@@ -195,7 +200,7 @@ def upload_sequential():
 
 def upload_parallel():
     """并行上传到所有平台（同时进行）"""
-    folder_path = r"E:\\Videos\\NA"
+    folder_path = DOWNLOAD_ROOT
     if not os.path.exists(folder_path):
         print(f"❌ 目录不存在: {folder_path}")
         return
@@ -251,10 +256,10 @@ def show_upload_mode_menu():
     print("2. 并行上传（所有平台同时进行）")
     print("="*60)
 
-def main():
+def upload_main():
     """主程序"""
     # 检查视频目录
-    folder_path = r"E:\处理完的数据\YouTube"
+    folder_path = DOWNLOAD_ROOT
     if not os.path.exists(folder_path):
         print(f"❌ 目录不存在: {folder_path}")
         return
@@ -289,4 +294,4 @@ def main():
         print("❌ 无效的平台选择")
 
 if __name__ == "__main__":
-    main()
+    upload_main()

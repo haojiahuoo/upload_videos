@@ -72,7 +72,8 @@ def translate_batch(sentences):
 
 def translate_vtt_file(input_file, output_file=None, batch_size=10):
     """🟨 翻译整个VTT文件，保持时间轴，批量翻译字幕内容（中文在英文下方，自动覆盖原文件）"""
-    
+    import re, time, os
+
     # 如果没有指定 output_file，就覆盖原文件
     if output_file is None:
         output_file = input_file
@@ -113,8 +114,15 @@ def translate_vtt_file(input_file, output_file=None, batch_size=10):
         # 达到批量大小 -> 翻译
         if len(buffer) >= batch_size:
             translated_results = translate_batch(buffer)
+
+            # ✅ 清理翻译结果（去掉开头/结尾的标点符号和空白）
+            cleaned_results = [
+                re.sub(r'^[\s"“”‘’、，。！？!?.；;：:【】\[\]（）()…—-]+|[\s"“”‘’、，。！？!?.；;：:【】\[\]（）()…—-]+$', '', t.strip())
+                for t in translated_results
+            ]
+
             # ✅ 逆序插入，防止索引错位
-            for idx, trans in sorted(zip(buffer_index, translated_results), reverse=True):
+            for idx, trans in sorted(zip(buffer_index, cleaned_results), reverse=True):
                 translated_lines.insert(idx + 1, trans + "\n")
             buffer.clear()
             buffer_index.clear()
@@ -123,7 +131,11 @@ def translate_vtt_file(input_file, output_file=None, batch_size=10):
     # 处理剩余未翻译的部分
     if buffer:
         translated_results = translate_batch(buffer)
-        for idx, trans in sorted(zip(buffer_index, translated_results), reverse=True):
+        cleaned_results = [
+            re.sub(r'^[\s"“”‘’、，。！？!?.；;：:【】\[\]（）()…—-]+|[\s"“”‘’、，。！？!?.；;：:【】\[\]（）()…—-]+$', '', t.strip())
+            for t in translated_results
+        ]
+        for idx, trans in sorted(zip(buffer_index, cleaned_results), reverse=True):
             translated_lines.insert(idx + 1, trans + "\n")
 
     # ✅ 直接覆盖原文件
@@ -131,7 +143,6 @@ def translate_vtt_file(input_file, output_file=None, batch_size=10):
         f.writelines(translated_lines)
 
     print(f"✅ 已翻译并覆盖原文件：{os.path.basename(output_file)}")
-
     return output_file
 
 def translate_ass_file(ass_path, translate_func=None):

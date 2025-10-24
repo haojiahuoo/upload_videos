@@ -1,4 +1,4 @@
-from config import MAX_SEGMENT_DURATION, DOWNLOAD_ROOT
+from config import MAX_SEGMENT_DURATION, DOWNLOAD_ROOT, UPLOAD_ROOT
 import os, subprocess, math
 
 def segment_video(full_video_path, title_cn, duration, index=1):
@@ -27,8 +27,8 @@ def segment_video(full_video_path, title_cn, duration, index=1):
         ]
 
         print(f"▶️ 分段第 {i + 1}/{num_parts} ({start}-{end}s): {part_path}")
-        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
-
+        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore")
+        
         # 检查生成结果
         if result.returncode != 0 or not os.path.exists(part_path) or os.path.getsize(part_path) == 0:
             all_parts_exist = False

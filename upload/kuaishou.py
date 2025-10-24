@@ -1,6 +1,6 @@
 # kuaishou.py
-from browser_manager import create_driver_with_user_data
-from common_utils import wait_for_element, wait_for_element_clickable, check_element_exists
+from utils.browser_manager import create_driver_with_user_data
+from utils.common_utils import wait_for_element, wait_for_element_clickable, check_element_exists
 from selenium.webdriver.common.by import By
 import time
 

@@ -11,6 +11,9 @@ MAX_SEGMENT_DURATION = 30 * 60  # 30 分钟
 DOWNLOAD_ROOT = r"E:\Videos"
 os.makedirs(DOWNLOAD_ROOT, exist_ok=True)  # 确保主目录存在
 
+UPLOAD_ROOT = r"E:\Videos\up_video"
+os.makedirs(UPLOAD_ROOT, exist_ok=True)  # 确保主目录存在
+
 # Cookie 来源（可改为 "chrome" 或 "firefox"）
 COOKIES_BROWSER = "firefox"
 

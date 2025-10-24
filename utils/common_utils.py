@@ -27,63 +27,82 @@ def contains_chinese(text):
     """判断文本是否包含中文字符"""
     return any('\u4e00' <= c <= '\u9fff' for c in text)
 
-def record_download(key, value, category, platform, mode):
+def record_download(key, value, video_path, platform, mode):
     """
-    记录下载或上传的文件信息（JSON格式）
-    参数:
-        video_url: 视频链接
-        full_video_path: 本地文件路径
-        category: "videos" | "subtitles" 字幕| "convert_vtt_ass" vtt转ass| "covers"
-        platform: "youtube"（可扩展为bilibili、tiktok等）
-        mode: "download" 或 "upload"
+    记录下载或上传任务（支持嵌套结构）
+    key:
+        普通键，如 'video_url'、'description'、'upload_path'
+        或字幕相关键，如 'vtt'、'translate'、'embed'
     """
-    
-    # 如果文件不存在，初始化结构
+    try:
+        json.dumps(value)
+    except TypeError:
+        value = str(value)
+
+    # 🔧 初始化数据结构
     if not os.path.exists(record_file):
-        data = {
-            platform: {
-                mode: {"videos": {}, "subtitles": {}, "convert_vtt_ass": {}, "covers": {}},
-            }
-        }
+        data = {}
     else:
         with open(record_file, "r", encoding="utf-8") as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
-                # 如果文件损坏或为空，重新初始化
-                data = {
-                    platform: {
-                            mode: {"videos": {}, "subtitles": {}, "dconvert_vtt_ass": {}, "covers": {}},
-                    }
-                }
+                data = {}
 
-    # 确保层级存在
+    # ✅ 确保多层结构存在
     data.setdefault(platform, {})
     data[platform].setdefault(mode, {})
-    data[platform][mode].setdefault(category, {})
+    data[platform][mode].setdefault(video_path, {})
+    data[platform][mode][video_path].setdefault("subtitles", {"vtt": False, "translate": False})
 
-    # 写入记录（以 video_url 为 key）
-    data[platform][mode][category][key] = value
+    # ✅ 根据 key 分类更新
+    if key in ("vtt", "ass", "translate", "embed"):
+        # 更新字幕相关状态
+        data[platform][mode][video_path]["subtitles"][key] = bool(value)
+    else:
+        # 其他普通任务（如 video_url、upload_path 等）
+        data[platform][mode][video_path][key] = value
 
-    # 保存 JSON 文件（格式化输出）
+    # ✅ 保存 JSON 文件
     os.makedirs(download_root, exist_ok=True)
     with open(record_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-    print(f"✅ 已记录 {platform}/{mode}/{category}: {key} -> {value}")
+    print(f"✅ 已记录 {platform}/{mode}/{video_path}: {key} -> {value}")
 
 
-def get_record(video_url, platform="youtube"):
+
+def get_record(video_path, platform, mode, done):
+    """
+    返回统一格式：
+    - done="subtitles" 返回 {"vtt": bool, "translate": bool, "ass": bool}
+    - 其他返回 {"done": bool}
+    """
     if not os.path.exists(record_file):
         return None
-    with open(record_file, "r", encoding="utf-8") as f:
+
+    with open(record_file, "r", encoding="utf-8", errors="ignore") as f:
         try:
             data = json.load(f)
         except json.JSONDecodeError:
             return None
-    for mode in ("download", "upload"):
-        for cat in ("videos", "subtitles", "descriptions", "covers"):
-            if platform in data and mode in data[platform] and cat in data[platform][mode]:
-                if video_url in data[platform][mode][cat]:
-                    return data[platform][mode][cat][video_url]
-    return None
+
+    task_info = data.get(platform, {}).get(mode, {}).get(video_path, {})
+    if not task_info:
+        return None
+
+    if done == "subtitles":
+        # 如果没有“subtitles”键，就默认 False
+        subtitles_info = task_info.get("subtitles", {})
+        # 保证返回字典
+        return {
+            "vtt": subtitles_info.get("vtt", False),
+            "translate": subtitles_info.get("translate", False)
+        }
+    else:
+        return {"done": task_info.get(done, False)}
+
+
+        
+    
+
