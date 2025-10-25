@@ -6,6 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from upload.douyin import DouyinUploader
 from upload.kuaishou import KuaishouUploader
 from upload.bibi import BibiUploader
+from upload.xiaohongshu import XiaohongshuUploader
 import os
 from pathlib import Path
 import time
@@ -125,6 +126,35 @@ def upload_to_bibi(video_files):
     print("🎉 B站：所有视频上传完成")
     return bibi
 
+
+def upload_to_xiaohongshu(video_files):
+    """上传到小红书"""
+    print("\n" + "="*50)
+    print("🚀 开始上传到小红书")
+    print("="*50)
+    
+    xiaohongshu = XiaohongshuUploader()
+    if xiaohongshu.login():
+        for i, video in enumerate(video_files, 1):
+            print(f"\n📤 小红书：正在上传第 {i}/{len(video_files)} 个视频: {video['title']}")
+            success = xiaohongshu.upload_video(video['path'], video['title'])
+            
+            if success:
+                print(f"✅ 小红书：第 {i} 个视频上传成功")
+            else:
+                print(f"❌ 小红书：第 {i} 个视频上传失败")
+            
+            # 上传间隔
+            if i < len(video_files):
+                print("⏳ 小红书：等待10秒后继续下一个视频...")
+                time.sleep(10)
+    else:
+        print("❌ 小红书：登录失败，跳过小红书上传")
+    
+    print("🎉 小红书：所有视频上传完成")
+    return xiaohongshu
+
+
 def upload_single_platform(platform_choice, video_files):
     """上传到单个指定平台"""
     browsers = []
@@ -143,6 +173,10 @@ def upload_single_platform(platform_choice, video_files):
             bibi = upload_to_bibi(video_files)
             browsers.append(bibi)
         elif platform_choice == "4":
+            # 上传到小红书
+            xiaohongshu = upload_to_xiaohongshu(video_files)
+            browsers.append(xiaohongshu)
+        elif platform_choice == "5":
             # 上传到抖音\快手\B站
             douyin = upload_to_douyin(video_files)
             browsers.append(douyin)
@@ -150,6 +184,8 @@ def upload_single_platform(platform_choice, video_files):
             browsers.append(kuaishou)
             bibi = upload_to_bibi(video_files)
             browsers.append(bibi)
+            xiaohongshu = upload_to_xiaohongshu(video_files)
+            browsers.append(xiaohongshu)
         else:
             print("❌ 无效的平台选择")
             return
@@ -189,6 +225,10 @@ def upload_sequential():
         bibi = upload_to_bibi(video_files)
         browsers.append(bibi)
         
+        # 上传到小红书
+        xiaohongshu = upload_to_xiaohongshu(video_files)
+        browsers.append(xiaohongshu)
+        
         # 可以继续添加其他平台...
         
     finally:
@@ -225,6 +265,10 @@ def upload_parallel():
     kuaishou_thread = threading.Thread(target=upload_to_bibi, args=(video_files,))
     threads.append(kuaishou_thread)
     
+    # 小红书上传线程
+    xiaohongshu_thread = threading.Thread(target=upload_to_xiaohongshu, args=(video_files,))
+    threads.append(xiaohongshu_thread)
+    
     # 启动所有线程
     print("🚀 开始并行上传到所有平台...")
     for thread in threads:
@@ -244,7 +288,8 @@ def show_platform_menu():
     print("1. 抖音")
     print("2. 快手") 
     print("3. B站")
-    print("4. 抖音 + 快手 + B站 (所有平台)")
+    print("4. 小红书")
+    print("5. 抖音 + 快手 + B站 + 小红书 (所有平台)")
     print("="*60)
 
 def show_upload_mode_menu():
@@ -273,11 +318,11 @@ def upload_main():
     show_platform_menu()
     platform_choice = input("请输入平台选择 (1/2/3/4): ").strip()
     
-    if platform_choice in ["1", "2", "3"]:
+    if platform_choice in ["1", "2", "3", "4"]:
         # 单个平台，直接上传
         upload_single_platform(platform_choice, video_files)
     
-    elif platform_choice == "4":
+    elif platform_choice == "5":
         # 多个平台，选择上传模式
         show_upload_mode_menu()
         mode_choice = input("请输入上传模式 (1/2): ").strip()

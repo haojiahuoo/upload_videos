@@ -18,7 +18,18 @@ def chinese_title(title, video_path, index=1):
         title_cn = title
     else:
         title_cn = translate_text(title)  # 你需要实现这个翻译函数
-        title_cn = title_cn.rstrip("。！？.,!?")
+        # ① 去掉文件扩展名
+        title_cn = os.path.splitext(title_cn)[0]
+
+        # ② 删除多余的竖线和重复空格
+        title_cn = re.sub(r'[|｜]+', ' ', title_cn)  # 竖线转空格
+        title_cn = re.sub(r'\s{2,}', ' ', title_cn)  # 多空格合并
+
+        # ③ 去掉结尾标点符号（中英文）
+        title_cn = title_cn.rstrip("。！？.,!?|｜ ")
+
+        # ④ 去掉首尾空格
+        title_cn = title_cn.strip()
 
     # 重命名视频文件为 title
     video_file = Path(video_path)
@@ -52,6 +63,8 @@ def get_video_info(video_url):
         auto_subs = info.get("automatic_captions", {}) or {} # 获取自动字幕信息
         all_langs = list(subs.keys()) + list(auto_subs.keys()) # 合并字幕语言列表
         has_zh_subs = any(lang.startswith("zh") for lang in all_langs) # 检查是否有中文字幕
+        print(f"duration : {duration}")
+        print(f"all_langs : {all_langs}")
         return has_zh_subs, title, duration, all_langs
 
     except Exception as e:

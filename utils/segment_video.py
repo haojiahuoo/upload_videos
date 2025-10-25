@@ -45,4 +45,12 @@ def segment_video(full_video_path, title_cn, duration, index=1):
 
     return all_parts_exist
 
-        
+# 单独调用
+# index=1
+# duration = 2655
+# title_cn= "森林中的离网桑拿我正在为我的新木屋做混凝土基础"
+# full_video_path = "E:\\Videos\\(01)森林中的离网桑拿我正在为我的新木屋做混凝土基础.mp4"
+# MAX_SEGMENT_DURATION = 30 * 60
+# DOWNLOAD_ROOT = r"E:\Videos"
+# os.makedirs(DOWNLOAD_ROOT, exist_ok=True)  # 确保主目录存在
+# segment_video(full_video_path, title_cn, duration, index=1)

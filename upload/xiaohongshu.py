@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 class XiaohongshuUploader:
     def __init__(self):
         self.driver = None
@@ -99,14 +100,14 @@ class XiaohongshuUploader:
                 return False
             
             # 填写视频标题
-            videos_name = wait_for_element_clickable(self.driver, By.XPATH, "//input[@class='d-text']")
-            videos_name.clear()
+            videos_name = wait_for_element_clickable(self.driver, By.XPATH, "//div[@class='tiptap ProseMirror']")
+            videos_name.click()
             videos_name.send_keys(name)
             print("✅ 小红书：视频标题已设置")
             
             # 设置封面
             try:
-                videos_fengmian = wait_for_element_clickable(self.driver, By.XPATH, "//div[@class='defaults']/div[3]/div[@class='cover-image column']")
+                videos_fengmian = wait_for_element_clickable(self.driver, By.XPATH, "//div[@class='defaults']/div[3]/div[contains(@class, 'cover-image')]")
                 videos_fengmian.click()    
                 time.sleep(2)
             
@@ -122,7 +123,7 @@ class XiaohongshuUploader:
             self.driver.execute_script("arguments[0].click();", videos_fabu)
             print("✅ 小红书：发布按钮已点击")
             # 等待发布完成
-            chenggong = wait_for_element(self.driver, By.XPATH, "//div[contains(text(), '发布成功')]")
+            chenggong = wait_for_element(self.driver, By.XPATH, "//span[contains(@class, 'title') and text()='上传视频']")
             if chenggong:
                 print("✅ 小红书：视频发布成功")
             
