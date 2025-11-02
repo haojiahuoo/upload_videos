@@ -1,14 +1,29 @@
 # bibi.py
-from utils.browser_manager import create_driver_with_user_data
 from utils.common_utils import wait_for_element, wait_for_element_clickable, check_element_exists
 from selenium.webdriver.common.by import By
 import time
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+COOKIES_DIR = "C:/ChromeUserData_xiaohongshu_Cookies"
 
 class XiaohongshuUploader:
     def __init__(self):
         self.driver = None
+    
+    def login(self, account_name):
+        """登录小红书"""
+        from utils.browser_manager import create_driver, save_cookies, load_cookies
+        self.driver = create_driver()
+        
+        if load_cookies(account_name, self.driver, COOKIES_DIR, "https://www.xiaohongshu.com/"):
+            if self.check_login_status():
+                print(f"✅ {account_name}账号 小红书：自动登录成功")
+                return True
+
+        # 需要手动登录
+        self.driver.get("https://www.xiaohongshu.com/")
+        print(f"🔐 请手动登录账号 {account_name}，登录完成后按回车继续...")
+        input()
+        save_cookies(account_name, self.driver, COOKIES_DIR)
+        return True
     
     def check_login_status(self):
         """检查登录状态"""
@@ -17,7 +32,6 @@ class XiaohongshuUploader:
             time.sleep(3)
             
             if "menu&target=video" in self.driver.current_url:
-                print("✅ 小红书：已处于登录状态")
                 return True
             else:
                 print("❌ 小红书：未登录或登录已过期")
@@ -25,51 +39,11 @@ class XiaohongshuUploader:
         except Exception as e:
             print(f"小红书：检查登录状态时出错: {e}")
             return False
-        
-    def login(self):
-        """登录小红书"""
-        try:
-            self.driver = create_driver_with_user_data("C:/ChromeUserData_xiaohongshu")  # 使用不同的用户目录
-            print("🚀 小红书：浏览器启动成功")
-            
-            if self.check_login_status():
-                try:
-                    # 检查是否已经登录
-                    if 'menu&target=video' in self.driver.current_url: 
-                        print("✅ 小红书：已进入发布页面")
-                        return True
-                except Exception as e:
-                    print(f"小红书为登录: {e}")
-                # 尝试直接访问发布页面
-                self.driver.get("https://creator.xiaohongshu.com/publish/publish?source=official&from=menu&target=video")
-                time.sleep(3)
-                return True
-            else:
-                # 需要手动登录
-                print("🔐 小红书：需要手动登录...")
-                input("请手动完成小红书登录，登录完成后按回车键继续...")
-                
-                # 验证登录是否成功
-                if self.check_login_status():
-                    print("✅ 小红书：登录成功！")
-                    return True
-                else:
-                    print("❌ 小红书：登录失败，请检查")
-                    return False
-                    
-        except Exception as e:
-            print(f"小红书：登录过程中出错: {e}")
-            return False
     
     def upload_video(self, video_path, name):    
         """上传视频到小红书"""
         try:
             print(f"📤 小红书：开始上传视频: {name}")
-            
-            # 确保在上传页面
-            if "'menu&target=video" not in self.driver.current_url:
-                self.driver.get("https://creator.xiaohongshu.com/publish/publish?source=official&from=menu&target=video")
-                time.sleep(3)
             
             # 上传文件
             file_input = wait_for_element(self.driver, By.XPATH, "//input[@type='file' and @accept]")

@@ -1,0 +1,62 @@
+[
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763353519,
+        "httpOnly": false,
+        "name": "kuaishou.web.cp.api_ph",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "b45f6ff72b8c43495b9235160e8ef29a6477"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763353519,
+        "httpOnly": true,
+        "name": "kuaishou.web.cp.api_st",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "ChZrdWFpc2hvdS53ZWIuY3AuYXBpLnN0ErABUyEQ4xbMcHTpFKlT5pGeDAtAd1pSgumqWXsUjWK3ZYfFG8b8w0Q2aq78m6XOeTUdRCezmy_YrA8XBdoKub_k7rg1AedFhaU9_e60zE6BToYp7kR8CwfddDVDfqYOX896hWT1xaMckUx85XpWmwWmZ8L4NKbjbvhGxXGnRAEH0UmkD0Nks1DoctOMQUC4ot5A22Vz-SI3QdeHIdjNWAQF9v7DOwtDrNlYRsq_DjKCCYcaEqJBif2xsoaQSxixvlVTQuhgiiIg8h-UgCXkdcejtWU6l4W9ZUXlyZepSR97e9KItHW_cWgoBTAB"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763353519,
+        "httpOnly": false,
+        "name": "userId",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "2422828615"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763353519,
+        "httpOnly": false,
+        "name": "bUserId",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "1000508118784"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1764649510,
+        "httpOnly": false,
+        "name": "kwfv1",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "PnGU+9+Y8008S+nH0U+0mjPf8fP08f+98f+nLlwnrIP9Ph8fPAPnLA8fGh80D9G0P7+0Dl80pY+0cM+nPAP/rlweHE80rhP0clwB+jGfzYGApSGAq9+Br78f+Y8BLFGf8DPnG9G9bY+nQjwBrh+B8SG/H7P9PUPBQY+AGIG/ZFPnP="
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1796616723,
+        "httpOnly": false,
+        "name": "did",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": true,
+        "value": "web_b7371695023a8c1b2f7d8c8e3e27a2b29474"
+    }
+]

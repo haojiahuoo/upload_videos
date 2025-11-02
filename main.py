@@ -1,5 +1,4 @@
 from download.youtube import *
-from logger.logger import *
 from upload.upload_main import upload_main
 
 def download_video(platform, play_url, index=1, is_playlist=True):
@@ -7,6 +6,7 @@ def download_video(platform, play_url, index=1, is_playlist=True):
         for i, url in enumerate(play_url, start=1):
             print(f"\n========== 🎬 开始下载第 {i} 个视频 ==========")
             download_video(platform, url, index=i, is_playlist=("list=" in url))
+            upload_main(platform)
         return
 
     if platform == "youtube":
@@ -23,7 +23,19 @@ def download_video(platform, play_url, index=1, is_playlist=True):
 if __name__ == "__main__":
     
     urls = [
-        "https://www.youtube.com/watch?v=zoZ5xzVffXQ&list=PLPff6vlxBmBHk-6D9_Cgk9qZidooDZoHQ"
+        "https://www.youtube.com/watch?v=TS5PX9n6QfA",
+        "https://www.youtube.com/watch?v=VzBbH6Yum50",
+        "https://www.youtube.com/watch?v=0XhivXeWgsc",
+        "https://www.youtube.com/watch?v=96g6m9JPWw4",
+        "https://www.youtube.com/watch?v=Z3kFmqY_h9U",
+        "https://www.youtube.com/watch?v=dGf9ao_QlFE",
+        "https://www.youtube.com/watch?v=5369tcuJltc",
+        "https://www.youtube.com/watch?v=-oK736-Qufo",
+        "https://www.youtube.com/watch?v=-oH20xjQYI8",
+        "https://www.youtube.com/watch?v=ypUHRJeZIS8",
+        "https://www.youtube.com/watch?v=6nBd_q3GVGU"
     ]
 
-    download_video("youtube", urls)
+    platform = "youtube"
+    download_video(platform, urls)
+    # upload_main(platform)

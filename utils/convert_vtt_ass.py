@@ -2,14 +2,14 @@ from pathlib import Path
 import re
 from utils.common_utils import *
 
-def convert_vtt_ass(temp_video_path, vtt_path, font_name="SimHei", font_size=60,
+def convert_vtt_ass(platform, temp_video_path, vtt_path, font_name="SimHei", font_size=60,
                 primary_color="&HFFFFFF&", outline_color="&H000000&", shadow=0):
     """
     自动将 VTT 转为 ASS 并嵌入视频（软字幕）
     temp_video_path: 视频文件路径
     vtt_path: VTT 字幕路径
     """
-    vtt_ass = get_record(temp_video_path, platform="youtube", mode="download", done="dconvert_vtt_ass")
+    vtt_ass = get_record(platform, "download", temp_video_path, done="dconvert_vtt_ass")
     if vtt_ass["done"]:
         print(f"⚠️ vtt文件已经转换为ass")
         return vtt_ass["done"]
@@ -68,5 +68,5 @@ def convert_vtt_ass(temp_video_path, vtt_path, font_name="SimHei", font_size=60,
             f.write("\n".join(dialogue_lines))
 
         print(f"✅ 已生成 ASS 字幕: {ass_path}")
-        record_download("dconvert_vtt_ass", ass_path, temp_video_path, platform="youtube", mode="download")
+        record_download(platform, "download", temp_video_path, "dconvert_vtt_ass", ass_path)
         return ass_path

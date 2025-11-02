@@ -3,9 +3,9 @@ import subprocess
 import os
 from utils.common_utils import *
 
-def embed_subtitle(temp_video_path, ass_path):
+def embed_subtitle(platform, temp_video_path, ass_path):
     
-    embed_subtitle = get_record(temp_video_path, platform="youtube", mode="download", done="embed_subtitle")
+    embed_subtitle = get_record(platform, "download", temp_video_path, done="embed_subtitle")
     if embed_subtitle["done"]:
         print(f"⚠️ 视频字幕已经嵌入完成")
         return embed_subtitle["done"]
@@ -39,5 +39,5 @@ def embed_subtitle(temp_video_path, ass_path):
 
         os.replace(tmp_path, temp_video_path)
         print("✅ 字幕嵌入完成")
-        record_download("embed_subtitle", temp_video_path, temp_video_path, platform="youtube", mode="download")
+        record_download(platform, "download", temp_video_path, "embed_subtitle", temp_video_path)
         return temp_video_path

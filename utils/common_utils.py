@@ -2,7 +2,7 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import os, json
+import os, json, shutil
 
 download_root = "downloads"  # 你可以根据需要修改
 record_file = os.path.join(download_root, "records.json")
@@ -27,7 +27,7 @@ def contains_chinese(text):
     """判断文本是否包含中文字符"""
     return any('\u4e00' <= c <= '\u9fff' for c in text)
 
-def record_download(key, value, video_path, platform, mode):
+def record_download(platform, mode, video_path, key, value):
     """
     记录下载或上传任务（支持嵌套结构）
     key:
@@ -72,7 +72,7 @@ def record_download(key, value, video_path, platform, mode):
 
 
 
-def get_record(video_path, platform, mode, done):
+def get_record(platform, mode, video_path, done):
     """
     返回统一格式：
     - done="subtitles" 返回 {"vtt": bool, "translate": bool, "ass": bool}
@@ -104,5 +104,20 @@ def get_record(video_path, platform, mode, done):
 
 
         
-    
+# -----------------------------
+# ✅ 上传完成后的目标文件夹（全局定义）
+# -----------------------------
+UPLOAD_DONE_DIR = r"E:\Videos\Uploaded"
+
+def move_to_uploaded_folder(file_path, target_dir=UPLOAD_DONE_DIR):
+    """上传完后移动视频文件"""
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    new_path = os.path.join(target_dir, os.path.basename(file_path))
+    try:
+        shutil.move(file_path, new_path)
+        print(f"✅ 文件已移动到：{new_path}")
+    except Exception as e:
+        print(f"⚠️ 移动文件失败：{e}")    
 

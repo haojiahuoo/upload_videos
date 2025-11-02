@@ -1,150 +1,187 @@
-# bibi.py
-from utils.browser_manager import create_driver_with_user_data
-from utils.common_utils import wait_for_element, wait_for_element_clickable, check_element_exists
+import os, time, re
 from selenium.webdriver.common.by import By
-import time
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from utils.browser_manager import SmartLoginManager
+from config import ACCOUNT_NAME
+from utils.image import resize_and_crop
+from utils.common_utils import *
+
 class BibiUploader:
-    def __init__(self):
+    def __init__(self, account_name=ACCOUNT_NAME):
+        self.account_name = account_name
+        self.manager = SmartLoginManager(site_name="bilibili", account_name=account_name)
         self.driver = None
     
-    def check_login_status(self):
-        """检查登录状态"""
-        try:
-            self.driver.get("https://member.bilibili.com/platform/upload/video/frame?page_from=creative_home_top_upload")
-            time.sleep(3)
-            
-            if "creative_home_top_upload" in self.driver.current_url:
-                print("✅ B站：已处于登录状态")
-                return True
-            else:
-                print("❌ B站：未登录或登录已过期")
-                return False
-        except Exception as e:
-            print(f"B站：检查登录状态时出错: {e}")
-            return False
+    def clean_title(self, title):
+        # 移除 (数字) 或 (数字-数字) 等前缀
+        return re.sub(r'^\(\d+[^)]*\)\s*', '', title).strip()
+
         
-    def login(self):
-        """登录B站"""
-        try:
-            self.driver = create_driver_with_user_data("C:/ChromeUserData_Bibi")  # 使用不同的用户目录
-            print("🚀 B站：浏览器启动成功")
-            
-            if self.check_login_status():
-                try:
-                    # 检查是否已经登录
-                    if 'creative_home_top_upload' in self.driver.current_url: 
-                        print("✅ B站：已进入发布页面")
-                        return True
-                except Exception as e:
-                    print(f"B站为登录: {e}")
-                # 尝试直接访问发布页面
-                self.driver.get("https://member.bilibili.com/platform/upload/video/frame?page_from=creative_home_top_upload")
-                time.sleep(3)
-                return True
+    def upload_to_bibi(self, media_files, platform):
+        """批量上传入口"""
+        print("\n" + "="*50)
+        print("🚀 开始上传到 B站")
+        print("="*50)
+
+        self.driver = self.manager.start()
+        
+        for i, video in enumerate(media_files['videos'], 1):
+            title = video['title']
+            video_path = video['path']
+            print(f"\n📤 正在上传第 {i}/{len(media_files['videos'])} 个视频: {title}")
+
+            cover_path = None
+            for img in media_files['images']:
+                if self.clean_title(img['title'].lower()) == self.clean_title(title.lower()):
+                    cover_path = img['path']
+                    break
+
+
+            success = self.upload_video(video_path, title, cover_path)
+
+            if success:
+                if self.fapu_video():
+                    record_download(platform, "upload", video_path, "bilibili", True)  # ✅ 上传+发布后移动文件
+                    print(f"✅ B站：第 {i} 个视频上传并移动完成")
             else:
-                # 需要手动登录
-                print("🔐 B站：需要手动登录...")
-                input("请手动完成B站登录，登录完成后按回车键继续...")
-                
-                # 验证登录是否成功
-                if self.check_login_status():
-                    print("✅ B站：登录成功！")
-                    return True
-                else:
-                    print("❌ B站：登录失败，请检查")
-                    return False
-                    
-        except Exception as e:
-            print(f"B站：登录过程中出错: {e}")
-            return False
-    
-    def upload_video(self, video_path, name):
-        """上传视频到B站"""
+                print(f"❌ B站：第 {i} 个视频上传失败")
+
+            if i < len(media_files['videos']):
+                print("⏳ 等待 5 秒后继续...")
+                time.sleep(5)
+
+        print("🎉 B站：所有视频上传完成")
+        self.quit()
+
+    def upload_video(self, video_path, title, cover_path=None):
+        """上传视频文件"""
         try:
-            print(f"📤 B站：开始上传视频: {name}")
-            
-            # 确保在上传页面
-            if "creative_home_top_upload" not in self.driver.current_url:
-                self.driver.get("https://member.bilibili.com/platform/upload/video/frame?page_from=creative_home_top_upload")
+            print(f"📤 B站：开始上传视频: {title}")
+            if "video/frame" not in self.driver.current_url:
+                self.driver.get("https://member.bilibili.com/platform/upload/video/frame")
                 time.sleep(3)
             
-            # 上传文件
+            # 如果没有看到上传视频按钮就刷新网页
+            time.sleep(2)
+            if not check_element_exists(self.driver, By.XPATH, "//div[@class='upload-btn no-events']"):
+                self.driver.refresh()
+            buyongle = check_element_exists(self.driver, By.XPATH, "//div[contains(text(), '不用了')]")
+            if buyongle:
+                wait_for_element(self.driver, By.XPATH, "//div[contains(text(), '不用了')]").click()
+            
+                
             file_input = wait_for_element(self.driver, By.XPATH, "//input[@type='file' and @accept]")
-            # ✅ 清空旧的文件选择（重点）
             self.driver.execute_script("arguments[0].value = '';", file_input)
             time.sleep(0.5)
-            # 选择新文件
             file_input.send_keys(video_path)
-            print(f"✅ B站：视频文件已选择: {name}")
-            return True
+            print(f"✅ 视频文件已选择: {title}")
+
+            button_zhidao = check_element_exists(self.driver, By.XPATH, "//button/span[contains(text(), '知道了')]")
+            if button_zhidao:
+                button_zhidao = wait_for_element(self.driver, By.XPATH, "//button/span[contains(text(), '知道了')]")
+                self.driver.execute_script("arguments[0].click();", button_zhidao)
+                print("关闭弹窗")
             
-        except Exception as e:
-            print(f"❌ B站：上传视频失败: {e}")
-            return False
+            if cover_path and os.path.exists(cover_path):
+                # cover = wait_for_element(self.driver, By.XPATH, "//span[text()='更换封面']")
+                # self.driver.execute_script("arguments[0].click();", cover)
+                # print("点击了更换封面")
+                # upload_cover = wait_for_element(self.driver, By.XPATH, "//div[text()='上传封面']")
+                # self.driver.execute_script("arguments[0].click();", upload_cover)
+                # print("点击了上传封面")
+                # 图片缩放到1200*900
+                resize_and_crop(cover_path, cover_path, size=(1200, 900), crop=False)
+                # 点击上传
+                cover_input = wait_for_element(self.driver, By.XPATH, "//input[@type='file' and @accept='image/png, image/jpeg']")
+                cover_input.send_keys(cover_path)
+                print("点击了上传")
+                # 点击完成                                             
+                click_cover = wait_for_element(self.driver, By.XPATH, "//button/span[contains(text(), '完成')]")
+                time.sleep(1)
+                self.driver.execute_script("arguments[0].click();", click_cover)
+                print("点击了完成")
+                print(f"🖼️ 封面已加载: {os.path.basename(cover_path)}")
+            else:
+                print("⚠️ 未找到封面，使用默认封面")
+
+            
+            # 分区操作
+            # 1. 点击下拉框
+            dropdown = wait_for_element(self.driver, By.XPATH, "//div[@class='video-human-type']//div[@class='select-controller']")
+            dropdown.click()
+            print("已展开下拉菜单")
     
+            # 2. 等待并选择户外潮流
+            outdoor_option = wait_for_element(self.driver, By.XPATH, "//div[@class='drop-list-v2-item' and @title='户外潮流']")
+            outdoor_option.click()
+            print("已选择户外潮流")
+
+            return True
+        except Exception as e:
+            print(f"❌ 上传视频失败: {e}")
+            return False
+
     def fapu_video(self):
         """发布视频"""
-        upload_complete = False
-        while True:
-            # 获取所有任务元素
-            tasks = self.driver.find_elements(By.XPATH, "//div[@class='task-list-content-item']")
-            if not tasks:
-                print("✅ 所有任务上传完成")
-                break
-
-            current = tasks[0]  # 拿第一个任务
-            current.click()
-            time.sleep(5)
-            print("🎬 点击第一个任务")
-
-            upload_complete = False
-            start_time = time.time()
-
-            while time.time() - start_time < 300:  # 最多等5分钟
-                try:
-                    # ✅ 只查找当前任务内部的状态
-                    status_elem = current.find_element(By.XPATH, "//span[contains(text(),'上传完成')]")
-                    status_text = status_elem.text.strip()
-                    if "上传完成" in status_text:
-                        print("✅ 当前视频上传完成")
-                        upload_complete = True
+        try:
+            if check_element_exists(self.driver, By.XPATH, "//span[contains(text(), '发布视频')]"):
+                upload_complete = False
+                while True:
+                    # 获取所有任务元素
+                    tasks = self.driver.find_elements(By.XPATH, "//div[@class='task-list-content-item']")
+                    if not tasks:
+                        print("✅ 所有任务上传完成")
                         break
 
-                except Exception as e:
-                    # 任务可能被刷新或删除
-                    pass
+                    current = tasks[0]  # 拿第一个任务
+                    current.click()
+                    time.sleep(5)
+                    print("🎬 点击第一个任务")
 
-                time.sleep(5)
+                    upload_complete = False
+                    start_time = time.time()
+
+                    while time.time() - start_time < 600:  # 最多等5分钟
+                        try:
+                            # ✅ 只查找当前任务内部的状态
+                            status_spans = self.driver.find_elements(By.XPATH, "//div[@class='file-item-content-status-text']/span")
+                            # 检查任意一个span是否包含"上传完成"
+                            for span in status_spans:
+                                print(span.text)
+                            if "上传完成" in span.text.strip():
+                                print("✅ 当前视频上传完成")
+                                upload_complete = True
+                                break
+                            # status_text = status_elem.text.strip()
+                            # if "上传完成" in status_text:
+                            #     print("✅ 当前视频上传完成")
+                            #     upload_complete = True
+                            #     break
+
+                        except Exception as e:
+                            # 任务可能被刷新或删除
+                            pass
+
+                        time.sleep(5)
+                        
+                    if not upload_complete:
+                        print("❌ B站：视频上传超时")
+                        return False
                 
-            if not upload_complete:
-                print("❌ B站：视频上传超时")
-                return False
-        
-            # 发布视频     wait_for_element
-            videos_fabu = wait_for_element_clickable(self.driver, By.XPATH, "//span[contains(@class, 'submit-add')]")
-            self.driver.execute_script("arguments[0].click();", videos_fabu)
-            print("✅ B站：点击立即投稿")
-            start_time = time.time()
-            while time.time() - start_time < 60:
-                try:
-                    alert = self.driver.find_element(By.XPATH, "//div[@role='alert']/p[contains(@class, 'bcc-message')]")
-                    message = alert.text.strip()
-                    if message:
-                        print(f"✅ B站提示：{message}")
-                        time.sleep(3)
-                        break
-                except:
-                    # 没有alert，继续等待
-                    pass
-                time.sleep(1)
-            
-            # # 刷新页面
-            # self.driver.refresh()
-            # if wait_for_element(self.driver, By.XPATH, "//div[contains(text(), '拖拽到此处也可上传')]"):
-            #     print("✅ B站：准备上传下一个视频")
+                    # 发布视频     wait_for_element
+                    videos_fabu = wait_for_element_clickable(self.driver, By.XPATH, "//span[contains(@class, 'submit-add')]")
+                    self.driver.execute_script("arguments[0].click();", videos_fabu)
+                    print("✅ B站：点击立即投稿")
+                    time.sleep(2)
+                    if check_element_exists(self.driver, By.XPATH, "//div[contains(text(),'稿件投递成功')]"):
+                        return True
+        except Exception as e:
+            print(f"❌ 发布视频时出错: {e}")
+            return False
+
     def quit(self):
         """关闭浏览器"""
         if self.driver:
             self.driver.quit()
+            print("🧹 浏览器已关闭")
+
+    

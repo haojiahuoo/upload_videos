@@ -12,7 +12,7 @@ from utils.embed_subtitle import *
 from utils.segment_video import segment_video
 from config import COOKIES_BROWSER, MAX_SEGMENT_DURATION, DOWNLOAD_ROOT, UPLOAD_ROOT
 
-def chinese_title(title, video_path, index=1):
+def chinese_title(title, video_path, thumbnail_path, description_path, index=1):
     # 判断标题是否含中文
     if contains_chinese(title):
         title_cn = title
@@ -20,7 +20,9 @@ def chinese_title(title, video_path, index=1):
         title_cn = translate_text(title)  # 你需要实现这个翻译函数
         # ① 去掉文件扩展名
         title_cn = os.path.splitext(title_cn)[0]
-
+        
+        # ① 去除所有特殊字符和表情符号（只保留中文、英文、数字、空格和基本标点）
+        title_cn = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\s。！？，、；："''''''''（）《》【】\-]', '', title_cn)
         # ② 删除多余的竖线和重复空格
         title_cn = re.sub(r'[|｜]+', ' ', title_cn)  # 竖线转空格
         title_cn = re.sub(r'\s{2,}', ' ', title_cn)  # 多空格合并
@@ -35,10 +37,23 @@ def chinese_title(title, video_path, index=1):
     video_file = Path(video_path)
     new_video_path = video_file.with_name(f"({index:02}){title_cn}{video_file.suffix}")
     
-    os.rename(video_path, new_video_path)  # 重命名文件
-    print(f"🎬 视频文件已重命名为: {new_video_path.name}")
+    # 重命名视频封面为 title
+    thumbanil_file = Path(thumbnail_path) 
+    new_thumbnail_path = thumbanil_file.with_name(f"({index:02}){title_cn}{thumbanil_file.suffix}")
     
-    return str(new_video_path), title_cn
+    # 重命名视频简介为 title
+    description_file = Path(description_path)
+    new_description_path = description_file.with_name(f"({index:02}){title_cn}{description_file.suffix}")
+    
+    os.rename(video_path, new_video_path)  # 重命名文件
+    os.rename(thumbnail_path, new_thumbnail_path)  # 重命名文件
+    os.rename(description_path, new_description_path)  # 重命名文件
+    
+    print(f"🎬 视频文件已重命名为: {new_video_path.name}")
+    print(f"🎬 视频封面已重命名为: {new_thumbnail_path.name}")
+    print(f"🎬 视频简介已重命名为: {new_description_path.name}")
+    
+    return str(new_video_path), str(new_thumbnail_path), str(new_description_path), title_cn
 
 
 def get_video_info(video_url):
@@ -83,7 +98,7 @@ def download_video(video_url, zh_available, platform, all_langs, index=1):
     is_english_sub = not zh_available
 
     # 判断是否已下载视频
-    video_done = get_record(temp_video_path, platform, "download", video_url)
+    video_done = get_record(platform, "download", temp_video_path, video_url)
     if not video_done:
         cmd = [
             "yt-dlp",
@@ -112,9 +127,24 @@ def download_video(video_url, zh_available, platform, all_langs, index=1):
             return None, None
         else:
             print("✅ 视频下载完成（完整视频）")
-            record_download(video_url, True, temp_video_path, platform, mode="download")
+            record_download(platform, "download", temp_video_path, video_url, True)
     else:
         print(f"⚠️ 视频已下载，跳过：{temp_video_path}")
+        
+    # -------------------------
+    # 构建附属文件路径
+    # -------------------------
+    base_name = os.path.splitext(temp_video_path)[0]
+    thumbnail_path = base_name + ".jpg"
+    description_path = base_name + ".description"
+
+    # 检查文件是否存在
+    if not os.path.exists(thumbnail_path):
+        print("⚠️ 未找到封面图（.jpg）")
+        thumbnail_path = None
+    if not os.path.exists(description_path):
+        print("⚠️ 未找到简介文件（.description）")
+        description_path = None
 
     # -------------------------
     # 处理字幕
@@ -123,14 +153,14 @@ def download_video(video_url, zh_available, platform, all_langs, index=1):
     # 如果没有字幕，直接返回临时视频地址
     if all_langs == []:
         print("⚠️ 视频没有字幕，直接返回临时视频地址")
-        return temp_video_path, None
+        return temp_video_path, None, thumbnail_path, description_path
     
     base = os.path.splitext(temp_video_path)[0]
     ass_files = glob.glob(base + "*.ass")
     vtt_files = glob.glob(base + "*.vtt")
     subs_path = None
 
-    record_result = get_record(temp_video_path, platform, "download", "subtitles")
+    record_result = get_record(platform, "download", temp_video_path, "subtitles")
     # 安全获取 vtt 和 translate
     if isinstance(record_result, dict):
         vtt_state = record_result.get("vtt", False)
@@ -146,15 +176,15 @@ def download_video(video_url, zh_available, platform, all_langs, index=1):
 
         if vtt_state and translate_state:
             print("✅ 字幕已处理过，直接使用")
-            return temp_video_path, subs_path
+            return temp_video_path, subs_path, thumbnail_path, description_path
 
         if is_english_sub:
             subs_path = translate_ass_file(subs_path)
             print(f"✅ 英文 ASS 字幕已翻译：{subs_path}")
 
         # 记录字幕状态
-        record_download("subtitles", {"ass": True, "translate": True}, temp_video_path, platform, mode="download")
-        return temp_video_path, subs_path
+        record_download(platform, "download", temp_video_path, "subtitles", {"ass": True, "translate": True})
+        return temp_video_path, subs_path, thumbnail_path, description_path
 
     # =============== VTT 字幕 ===============
     elif vtt_files:
@@ -163,20 +193,20 @@ def download_video(video_url, zh_available, platform, all_langs, index=1):
 
         if vtt_state and translate_state:
             print("✅ 字幕已处理过，直接使用")
-            return temp_video_path, subs_path
+            return temp_video_path, subs_path, thumbnail_path, description_path
 
         if is_english_sub:
             subs_path = translate_vtt_file(subs_path, batch_size=10)
             print(f"✅ 英文 VTT 字幕翻译完成：{subs_path}")
 
         # 记录字幕状态
-        record_download("subtitles", {"vtt": True, "translate": True}, temp_video_path, platform, mode="download")
-        return temp_video_path, subs_path
+        record_download(platform, "download", temp_video_path, "subtitles", {"vtt": True, "translate": True})
+        return temp_video_path, subs_path, thumbnail_path, description_path
 
     # =============== 没找到字幕 ===============
     else:
         print("⚠️ 未找到字幕文件。")
-        return temp_video_path, None
+        return temp_video_path, None, thumbnail_path, description_path
 
 
 
@@ -200,7 +230,7 @@ def process_video(video_url, platform, index=1):
     try: 
         print(f"\n▶️ 正在处理第 {index} 个视频：{video_url}")
         name = f"E:\\Videos\\temp_{index:02}.mp4"
-        title_record = get_record(name, platform="youtube", mode="download", done="title_cn")
+        title_record = get_record(platform, "download", name, done="title_cn")
         if title_record and title_record.get("done"):
             print(f"⚠️ 视频已经全部处理完，跳过...")
             return True
@@ -210,14 +240,14 @@ def process_video(video_url, platform, index=1):
             has_zh_subs, title, duration, all_langs = get_video_info(video_url)
             
             # 下载视频和字幕
-            temp_video_path, subs_path = download_video(video_url, has_zh_subs, platform, all_langs, index)
+            temp_video_path, subs_path, thumbnail_path, description_path = download_video(video_url, has_zh_subs, platform, all_langs, index)
             if not all_langs == []: # 如果字幕为空
-                ass_path = convert_vtt_ass(temp_video_path, subs_path)   # 把vtt转换为ass
-                temp_video_path = embed_subtitle(temp_video_path, ass_path)  # 把ass字幕嵌入视频中
+                ass_path = convert_vtt_ass(platform, temp_video_path, subs_path)   # 把vtt转换为ass
+                temp_video_path = embed_subtitle(platform, temp_video_path, ass_path)  # 把ass字幕嵌入视频中
 
             # 生成中文标题和最终路径
-            video_path, title_cn = chinese_title(title, temp_video_path, index)
-            record_download("title_cn", title_cn, temp_video_path, platform="youtube", mode="download")
+            video_path, thumbnail_path, description_path, title_cn = chinese_title(title, temp_video_path, thumbnail_path, description_path, index)
+            record_download(platform, "download", temp_video_path, "title_cn", title_cn)
 
             # 如果视频太长则分段
             if duration > MAX_SEGMENT_DURATION:
