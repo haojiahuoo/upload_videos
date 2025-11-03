@@ -27,7 +27,7 @@ class DouyinUploader:
 
             cover_path = None
             for img in media_files['images']:
-                if img['title'].lower() == title.lower():
+                if clean_title(img['title'].lower()) == clean_title(title.lower()):
                     cover_path = img['path']
                     break
 

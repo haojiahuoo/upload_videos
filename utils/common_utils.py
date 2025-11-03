@@ -2,7 +2,7 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import os, json, shutil
+import os, json, shutil, re
 
 download_root = "downloads"  # 你可以根据需要修改
 record_file = os.path.join(download_root, "records.json")
@@ -22,6 +22,10 @@ def check_element_exists(driver, by, locator, timeout=5):
         return True
     except:
         return False
+
+def clean_title(title):
+    # 移除 (数字) 或 (数字-数字) 等前缀
+    return re.sub(r'^\(\d+[^)]*\)\s*', '', title).strip()
 
 def contains_chinese(text):
     """判断文本是否包含中文字符"""

@@ -10,11 +10,6 @@ class BibiUploader:
         self.account_name = account_name
         self.manager = SmartLoginManager(site_name="bilibili", account_name=account_name)
         self.driver = None
-    
-    def clean_title(self, title):
-        # 移除 (数字) 或 (数字-数字) 等前缀
-        return re.sub(r'^\(\d+[^)]*\)\s*', '', title).strip()
-
         
     def upload_to_bibi(self, media_files, platform):
         """批量上传入口"""
@@ -31,7 +26,7 @@ class BibiUploader:
 
             cover_path = None
             for img in media_files['images']:
-                if self.clean_title(img['title'].lower()) == self.clean_title(title.lower()):
+                if clean_title(img['title'].lower()) == clean_title(title.lower()):
                     cover_path = img['path']
                     break
 
@@ -62,7 +57,7 @@ class BibiUploader:
             
             # 如果没有看到上传视频按钮就刷新网页
             time.sleep(2)
-            if not check_element_exists(self.driver, By.XPATH, "//div[@class='upload-btn no-events']"):
+            if check_element_exists(self.driver, By.XPATH, "//div[contains(text(), '稿件投递成功')]"):
                 self.driver.refresh()
             buyongle = check_element_exists(self.driver, By.XPATH, "//div[contains(text(), '不用了')]")
             if buyongle:
@@ -82,12 +77,13 @@ class BibiUploader:
                 print("关闭弹窗")
             
             if cover_path and os.path.exists(cover_path):
-                # cover = wait_for_element(self.driver, By.XPATH, "//span[text()='更换封面']")
-                # self.driver.execute_script("arguments[0].click();", cover)
-                # print("点击了更换封面")
-                # upload_cover = wait_for_element(self.driver, By.XPATH, "//div[text()='上传封面']")
-                # self.driver.execute_script("arguments[0].click();", upload_cover)
-                # print("点击了上传封面")
+                if check_element_exists(self.driver, By.XPATH, "//span[text()='更换封面']"):
+                    cover = wait_for_element(self.driver, By.XPATH, "//span[text()='更换封面']")
+                    self.driver.execute_script("arguments[0].click();", cover)
+                    print("点击了更换封面")
+                    upload_cover = wait_for_element(self.driver, By.XPATH, "//div[text()='上传封面']")
+                    self.driver.execute_script("arguments[0].click();", upload_cover)
+                    print("点击了上传封面")
                 # 图片缩放到1200*900
                 resize_and_crop(cover_path, cover_path, size=(1200, 900), crop=False)
                 # 点击上传
@@ -107,12 +103,14 @@ class BibiUploader:
             # 分区操作
             # 1. 点击下拉框
             dropdown = wait_for_element(self.driver, By.XPATH, "//div[@class='video-human-type']//div[@class='select-controller']")
-            dropdown.click()
+            time.sleep(1)
+            self.driver.execute_script("arguments[0].click();", dropdown)
             print("已展开下拉菜单")
     
             # 2. 等待并选择户外潮流
             outdoor_option = wait_for_element(self.driver, By.XPATH, "//div[@class='drop-list-v2-item' and @title='户外潮流']")
-            outdoor_option.click()
+            time.sleep(1)
+            self.driver.execute_script("arguments[0].click();", outdoor_option)
             print("已选择户外潮流")
 
             return True
@@ -151,11 +149,6 @@ class BibiUploader:
                                 print("✅ 当前视频上传完成")
                                 upload_complete = True
                                 break
-                            # status_text = status_elem.text.strip()
-                            # if "上传完成" in status_text:
-                            #     print("✅ 当前视频上传完成")
-                            #     upload_complete = True
-                            #     break
 
                         except Exception as e:
                             # 任务可能被刷新或删除

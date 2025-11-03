@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from upload.douyin import DouyinUploader
 from upload.kuaishou import KuaishouUploader
 from upload.bibi import BibiUploader
-from upload.xiaohongshu import XiaohongshuUploader
+from upload.weixin import WeixinUploader
 import os, time, threading
 from pathlib import Path
 from config import DOWNLOAD_ROOT, UPLOAD_ROOT, ACCOUNT_NAME
@@ -15,6 +15,7 @@ from utils.common_utils import *
 bilibili_upload = BibiUploader()
 kuaishou_upload = KuaishouUploader()
 douyin_upload = DouyinUploader()
+weixin_upload = WeixinUploader()
 
 def list_media_files(directory, platform, site_name):
     """列出目录中的所有视频和图片文件"""
@@ -64,62 +65,19 @@ def list_media_files(directory, platform, site_name):
         print(f"📊 大小: {v['size']} MB")
         print("-" * 50)
 
-    # 打印图片
-    print(f"\n🖼️ 找到 {len(images)} 张图片:")
-    for img in images:
-        print(f"🖼️ 标题: {img['title']}")
-        print(f"📁 文件名: {img['filename']}")
-        print(f"📍 路径: {img['path']}")
-        print(f"📊 大小: {img['size']} MB")
-        print("-" * 50)
+    # # 打印图片
+    # print(f"\n🖼️ 找到 {len(images)} 张图片:")
+    # for img in images:
+    #     print(f"🖼️ 标题: {img['title']}")
+    #     print(f"📁 文件名: {img['filename']}")
+    #     print(f"📍 路径: {img['path']}")
+    #     print(f"📊 大小: {img['size']} MB")
+    #     print("-" * 50)
 
     return {
         'videos': videos,
         'images': images
     }
-
-# 小红书
-def upload_to_xiaohongshu(media_files):
-    """上传到小红书"""
-    print("\n" + "="*50)
-    print("🚀 开始上传到小红书")
-    print("="*50)
-    
-    xiaohongshu = XiaohongshuUploader()
-    if xiaohongshu.login(ACCOUNT_NAME):
-        for i, video in enumerate(media_files['videos'], 1):
-            video_title = video['title']
-            print(f"\n📤 抖音：正在上传第 {i}/{len(media_files['videos'])} 个视频: {video_title}")
-
-            # ✅ 查找与视频同名的图片
-            cover_path = None
-            for img in media_files['images']:
-                if img['title'].lower() == video_title.lower():
-                    cover_path = img['path']
-                    break
-
-            if cover_path:
-                print(f"🖼️ 找到封面图: {cover_path}")
-            else:
-                print("⚠️ 未找到对应封面图，使用默认封面")
-
-            # 上传
-            success = xiaohongshu.upload_video(video['path'], video_title, cover_path)
-            
-            if success:
-                print(f"✅ 小红书：第 {i} 个视频上传成功")
-            else:
-                print(f"❌ 小红书：第 {i} 个视频上传失败")
-            
-            # 上传间隔
-            if i < len(media_files):
-                print("⏳ 小红书：等待10秒后继续下一个视频...")
-                time.sleep(10)
-    else:
-        print("❌ 小红书：登录失败，跳过小红书上传")
-    
-    print("🎉 小红书：所有视频上传完成")
-    return xiaohongshu
 
 def upload_single_platform(platform_choice, platform):
     """上传到单个指定平台"""
@@ -134,29 +92,46 @@ def upload_single_platform(platform_choice, platform):
         if platform_choice == "1":
             # 上传到抖音
             media_files = list_media_files(folder_path, platform, "douyin")
-            if not media_files:
-                print("❌ 没有找到视频文件")
-                return
-            douyin = douyin_upload.upload_to_douyin(media_files, platform)
-            browsers.append(douyin)
+            if not media_files:  
+                print(f"❌ 抖音：没有找到视频文件")
+            elif media_files["videos"] == []:
+                print(f"✅ 抖音：视频文件已经上传")
+            else:
+                douyin = douyin_upload.upload_to_douyin(media_files, platform)
+                browsers.append(douyin)
                     
         elif platform_choice == "2":
             # 上传到快手
             media_files = list_media_files(folder_path, platform, "kuaishou")
-            if not media_files:
-                print("❌ 没有找到视频文件")
-                return
-            kuaishou = kuaishou_upload.upload_to_kuaishou(media_files, platform)
-            browsers.append(kuaishou)   
+            if not media_files:  
+                print(f"❌ 快手：没有找到视频文件")
+            elif media_files["videos"] == []:
+                print(f"✅ 快手：视频文件已经上传")
+            else:
+                kuaishou = kuaishou_upload.upload_to_kuaishou(media_files, platform)
+                browsers.append(kuaishou)  
                     
         elif platform_choice == "3":
             # 上传到B站   
             media_files = list_media_files(folder_path, platform, "bilibili")
-            if not media_files:
-                print("❌ 没有找到视频文件")
-                return
-            bili = bilibili_upload.upload_to_bibi(media_files, platform)
-            browsers.append(bili)
+            if not media_files:  
+                print(f"❌ B站：没有找到视频文件")
+            elif media_files["videos"] == []:
+                print(f"✅ B站：视频文件已经上传")
+            else:
+                bili = bilibili_upload.upload_to_bibi(media_files, platform)
+                browsers.append(bili)
+        
+        elif platform_choice == "4":
+            # 上传到微信视频号   
+            media_files = list_media_files(folder_path, platform, "weixin")
+            if not media_files:  
+                print(f"❌ 微信视频号：没有找到视频文件")
+            elif media_files["videos"] == []:
+                print(f"✅ 微信视频号：视频文件已经上传")
+            else:
+                weixin = weixin_upload.upload_to_weixin(media_files, platform)
+                browsers.append(weixin)
         
         else:
             print("❌ 无效的平台选择")
@@ -179,7 +154,6 @@ def upload_single_platform(platform_choice, platform):
                 except:
                     pass
 
-
 def upload_sequential(platform):
     """顺序上传到所有平台（一个平台完成后开始下一个）"""
     folder_path = UPLOAD_ROOT
@@ -193,27 +167,43 @@ def upload_sequential(platform):
     try:
         # 上传到抖音
         media_files = list_media_files(folder_path, platform, "douyin")
-        if not media_files:
-            print("❌ 没有找到视频文件")
-            return
-        douyin = douyin_upload.upload_to_douyin(media_files, platform)
-        browsers.append(douyin)
+        if not media_files:  
+            print(f"❌ 抖音：没有找到视频文件")
+        elif media_files["videos"] == []:
+            print(f"✅ 抖音：视频文件已经上传")
+        else:
+            douyin = douyin_upload.upload_to_douyin(media_files, platform)
+            browsers.append(douyin)
         
         # 上传到快手
         media_files = list_media_files(folder_path, platform, "kuaishou")
-        if not media_files:
-            print("❌ 没有找到视频文件")
-            return
-        kuaishou = kuaishou_upload.upload_to_kuaishou(media_files, platform)
-        browsers.append(kuaishou)
+        if not media_files:  
+            print(f"❌ 快手：没有找到视频文件")
+        elif media_files["videos"] == []:
+            print(f"✅ 快手：视频文件已经上传")
+        else:
+            kuaishou = kuaishou_upload.upload_to_kuaishou(media_files, platform)
+            browsers.append(kuaishou)
         
         # 上传到B站
         media_files = list_media_files(folder_path, platform, "bilibili")
-        if not media_files:
-            print("❌ 没有找到视频文件")
-            return
-        bili = bilibili_upload.upload_to_bibi(media_files, platform)
-        browsers.append(bili)
+        if not media_files:  
+            print(f"❌ B站：没有找到视频文件")
+        elif media_files["videos"] == []:
+            print(f"✅ B站：视频文件已经上传")
+        else:
+            bili = bilibili_upload.upload_to_bibi(media_files, platform)
+            browsers.append(bili)
+        
+        # 上传到微信视频号
+        media_files = list_media_files(folder_path, platform, "weixin")
+        if not media_files:  
+            print(f"❌ 微信视频号：没有找到视频文件")
+        elif media_files["videos"] == []:
+            print(f"✅ 微信视频号：视频文件已经上传")
+        else:
+            weixin = weixin_upload.upload_to_weixin(media_files, platform)
+            browsers.append(weixin)
         
         # 可以继续添加其他平台...
         
@@ -232,13 +222,13 @@ def show_platform_menu():
     print("1. 抖音")
     print("2. 快手") 
     print("3. B站")
-    print("4. 小红书")
-    print("5. 抖音 + 快手 + B站 + 小红书 (所有平台)")
+    print("4. 微信")
+    print("5. 抖音 + 快手 + B站 + 微信 (所有平台)")
     print("="*60)
 
 def upload_main(platform):
     """主程序"""
-
+    
     # # 自动上传
     # upload_sequential(platform)
     

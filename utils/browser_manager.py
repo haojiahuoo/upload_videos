@@ -12,8 +12,9 @@ class SmartLoginManager:
 
     SUPPORTED_SITES = {
         "bilibili": "https://member.bilibili.com/platform/upload/video/frame",
-        "douyin": "https://creator.douyin.com/creator-micro/content/upload?enter_from=dou_web/",
-        "kuaishou": "https://cp.kuaishou.com/article/publish/video?origin=www.kuaishou.com&source=PROFILE/"
+        "douyin": "https://creator.douyin.com/creator-micro/content/upload?enter_from=dou_web",
+        "kuaishou": "https://cp.kuaishou.com/article/publish/video?origin=www.kuaishou.com&source=PROFILE",
+        "weixin": "https://channels.weixin.qq.com/platform/post/create",
     }
 
     def __init__(self, site_name, account_name, cookies_root="cookies", headless=False):
@@ -225,7 +226,7 @@ class SmartLoginManager:
             if self.site_name == "kuaishou":
                 try:
                     # 查找个人中心或头像
-                    if self.driver.find_element(By.CSS_SELECTOR, ".user-info-name"):
+                    if self.driver.find_elements(By.CSS_SELECTOR, ".user-info-name"):
                         return True
                 except Exception:
                     pass
@@ -241,6 +242,15 @@ class SmartLoginManager:
                     pass
 
                 return ("立即登录" not in self.driver.page_source)
+
+            if self.site_name == "weixin":
+                # 临时调试代码
+                elements = self.driver.find_elements(By.CSS_SELECTOR, "wujie-app")
+                print(f"找到 {len(elements)} 个wujie-app元素")
+                if len(elements) > 0:
+                    return True
+                else:
+                    return False
 
             # 其他站点默认回退到 page_source
             return "登录" not in self.driver.page_source

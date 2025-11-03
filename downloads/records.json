@@ -64,6 +64,14 @@
                 },
                 "https://www.youtube.com/watch?v=-oK736-Qufo": true,
                 "title_cn": "太阳女在雨中捕鱼 森林露营与自然ASMR"
+            },
+            "E:\\Videos\\temp_09.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=-oH20xjQYI8": true,
+                "title_cn": "独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚"
             }
         },
         "upload": {
@@ -74,7 +82,8 @@
                 },
                 "kuaishou": true,
                 "douyin": true,
-                "bilibili": true
+                "bilibili": true,
+                "weixin": true
             },
             "E:\\Videos\\(02)ASMR 单身女孩摩托车露营-森林帐篷和篝火牛排.mp4": {
                 "subtitles": {
@@ -83,7 +92,8 @@
                 },
                 "douyin": true,
                 "kuaishou": true,
-                "bilibili": true
+                "bilibili": true,
+                "weixin": true
             },
             "E:\\Videos\\(03)与我的狗独自远足 大雨和舒适帐篷露营（ASMR）.mp4": {
                 "subtitles": {
@@ -122,6 +132,41 @@
                 "bilibili": true
             },
             "E:\\Videos\\(07)在斯堪的纳维亚荒野独自徒步5天单身女孩丛林和篝火烹饪ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(08-1)太阳女在雨中捕鱼 森林露营与自然ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "bilibili": true,
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(08-2)太阳女在雨中捕鱼 森林露营与自然ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "bilibili": true,
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(09-1)独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(09-2)独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚.mp4": {
                 "subtitles": {
                     "vtt": false,
                     "translate": false

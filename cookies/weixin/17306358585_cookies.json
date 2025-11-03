@@ -1,0 +1,22 @@
+[
+    {
+        "domain": ".channels.weixin.qq.com",
+        "expiry": 1796731441,
+        "httpOnly": false,
+        "name": "sessionid",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": true,
+        "value": "BgAAvwZoWwDw0rLfcoPJbF8SuIU2%2BPrzbkEYVfaslGkZgRedgKuAKgtm7MLufu4D1PiEYQYdY6P3PMsNEIR1Fhpt9sZ8t4%2FHJRNDWsY0mJr9"
+    },
+    {
+        "domain": ".channels.weixin.qq.com",
+        "expiry": 1796731441,
+        "httpOnly": false,
+        "name": "wxuin",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": true,
+        "value": "3502173700"
+    }
+]
