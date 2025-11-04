@@ -1,22 +1,22 @@
 [
     {
-        "domain": ".channels.weixin.qq.com",
-        "expiry": 1796731441,
-        "httpOnly": false,
-        "name": "sessionid",
-        "path": "/",
-        "sameSite": "Lax",
-        "secure": true,
-        "value": "BgAAvwZoWwDw0rLfcoPJbF8SuIU2%2BPrzbkEYVfaslGkZgRedgKuAKgtm7MLufu4D1PiEYQYdY6P3PMsNEIR1Fhpt9sZ8t4%2FHJRNDWsY0mJr9"
-    },
-    {
-        "domain": ".channels.weixin.qq.com",
-        "expiry": 1796731441,
+        "domain": "channels.weixin.qq.com",
+        "expiry": 1796804861,
         "httpOnly": false,
         "name": "wxuin",
         "path": "/",
-        "sameSite": "Lax",
+        "sameSite": "None",
         "secure": true,
-        "value": "3502173700"
+        "value": "2226257810"
+    },
+    {
+        "domain": "channels.weixin.qq.com",
+        "expiry": 1796804861,
+        "httpOnly": false,
+        "name": "sessionid",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "BgAALai9j9VDZGKBy%2FtR3lkR9ctpASd6%2F7vUI7J4obht0zBSzequDTT%2FUa4wC6z5QihoIDZ5MuZs9GPZ0gAa4QEMCW0juNpmlxGLlRX7IuND"
     }
 ]

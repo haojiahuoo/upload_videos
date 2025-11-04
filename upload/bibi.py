@@ -77,13 +77,13 @@ class BibiUploader:
                 print("关闭弹窗")
             
             if cover_path and os.path.exists(cover_path):
-                if check_element_exists(self.driver, By.XPATH, "//span[text()='更换封面']"):
-                    cover = wait_for_element(self.driver, By.XPATH, "//span[text()='更换封面']")
+                if check_element_exists(self.driver, By.XPATH, "//div[contains(@class, 'cover-main-img')]"):
+                    cover = wait_for_element(self.driver, By.XPATH, "//div[contains(@class, 'cover-main-img')]")
                     self.driver.execute_script("arguments[0].click();", cover)
-                    print("点击了更换封面")
-                    upload_cover = wait_for_element(self.driver, By.XPATH, "//div[text()='上传封面']")
-                    self.driver.execute_script("arguments[0].click();", upload_cover)
-                    print("点击了上传封面")
+                    print("点击了编辑封面")
+                    # upload_cover = wait_for_element(self.driver, By.XPATH, "//div[text()='上传封面']")
+                    # self.driver.execute_script("arguments[0].click();", upload_cover)
+                    # print("点击了上传封面")
                 # 图片缩放到1200*900
                 resize_and_crop(cover_path, cover_path, size=(1200, 900), crop=False)
                 # 点击上传
@@ -91,28 +91,31 @@ class BibiUploader:
                 cover_input.send_keys(cover_path)
                 print("点击了上传")
                 # 点击完成                                             
-                click_cover = wait_for_element(self.driver, By.XPATH, "//button/span[contains(text(), '完成')]")
+                click_cover = wait_for_element(self.driver, By.XPATH, "//div[contains(text(), '完成制作')]")
                 time.sleep(1)
                 self.driver.execute_script("arguments[0].click();", click_cover)
                 print("点击了完成")
-                print(f"🖼️ 封面已加载: {os.path.basename(cover_path)}")
+                click_element = wait_for_element_disappear(self.driver, By.XPATH, "//div[@class='button submit button submit']")
+                if click_element:
+                    print(f"🖼️ 封面已加载: {os.path.basename(cover_path)}")
             else:
                 print("⚠️ 未找到封面，使用默认封面")
 
             
             # 分区操作
             # 1. 点击下拉框
+            time.sleep(2)
             dropdown = wait_for_element(self.driver, By.XPATH, "//div[@class='video-human-type']//div[@class='select-controller']")
             time.sleep(1)
             self.driver.execute_script("arguments[0].click();", dropdown)
             print("已展开下拉菜单")
     
             # 2. 等待并选择户外潮流
-            outdoor_option = wait_for_element(self.driver, By.XPATH, "//div[@class='drop-list-v2-item' and @title='户外潮流']")
+            outdoor_option = wait_for_element(self.driver, By.XPATH, "//div[contains(@class, 'drop-list-v2-item') and @title='美食']")
             time.sleep(1)
             self.driver.execute_script("arguments[0].click();", outdoor_option)
             print("已选择户外潮流")
-
+            time.sleep(2)
             return True
         except Exception as e:
             print(f"❌ 上传视频失败: {e}")
@@ -125,14 +128,14 @@ class BibiUploader:
                 upload_complete = False
                 while True:
                     # 获取所有任务元素
-                    tasks = self.driver.find_elements(By.XPATH, "//div[@class='task-list-content-item']")
+                    tasks = wait_for_elements(self.driver, By.XPATH, "//div[@class='task-list-content-item']")
                     if not tasks:
                         print("✅ 所有任务上传完成")
                         break
 
                     current = tasks[0]  # 拿第一个任务
-                    current.click()
-                    time.sleep(5)
+                    self.driver.execute_script("arguments[0].click();", current)
+                    time.sleep(2)
                     print("🎬 点击第一个任务")
 
                     upload_complete = False
@@ -141,7 +144,7 @@ class BibiUploader:
                     while time.time() - start_time < 600:  # 最多等5分钟
                         try:
                             # ✅ 只查找当前任务内部的状态
-                            status_spans = self.driver.find_elements(By.XPATH, "//div[@class='file-item-content-status-text']/span")
+                            status_spans = wait_for_elements(self.driver, By.XPATH, "//div[@class='file-item-content-status-text']/span")
                             # 检查任意一个span是否包含"上传完成"
                             for span in status_spans:
                                 print(span.text)

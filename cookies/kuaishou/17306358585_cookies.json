@@ -1,0 +1,62 @@
+[
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763533559,
+        "httpOnly": false,
+        "name": "kuaishou.web.cp.api_ph",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "916a618c842769371d62cf461d0b1f5b1230"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763533559,
+        "httpOnly": true,
+        "name": "kuaishou.web.cp.api_st",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "ChZrdWFpc2hvdS53ZWIuY3AuYXBpLnN0ErABcmDNIgzHok_SVEYjq-TkcoEQs0lGjhFyhHRcanwYlhhucIW-B9nIWNtElMk4YbMJT_BZAxaGJrapyl6kaKylS6edcrwBDmVfPJNNPPzISnVKEtth5Qnwt8d3esyz1RWJklk-kYRLtCoGRUEAVeaUSvzPTLgZ-nxHLTDBxe8X5dgZvuo_7EHtx3WBsriJoSAsNu9JkUgtwRsj6aI9ZwIOZg2GL_7Qgx1Tmm_HQCVtu3saEonX9Cez0-PuNGEQ1dhbSKRhryIgmh_atbWOVJOMkxuY2SoD8Oy470OvwJ_GHoyP6XxBBzUoBTAB"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763533559,
+        "httpOnly": false,
+        "name": "userId",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "5109232301"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1763533559,
+        "httpOnly": false,
+        "name": "bUserId",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "value": "1000514472582"
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1764829549,
+        "httpOnly": false,
+        "name": "kwfv1",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "PnGU+9+Y8008S+nH0U+0mjPf8fP08f+98f+nLlwnrIP9Ph8fPAPnLA8fGh80D9G0P7+0Dl80pY+0cM+nPAP/rlweG7+fPl+frIPePhG/ZFGfrAG/DUG/Dlw/Yf+eYfw/+fGnpj8BchGfHAwBQj8ezS8eHhP/qEP/L98fL9w/r7P9H="
+    },
+    {
+        "domain": ".kuaishou.com",
+        "expiry": 1796748546,
+        "httpOnly": false,
+        "name": "did",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": true,
+        "value": "web_809cb87dcd37b4b1d8e25a755dca6f85855a"
+    }
+]

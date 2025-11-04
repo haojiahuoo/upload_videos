@@ -10,6 +10,7 @@ from utils.translate import *
 from utils.convert_vtt_ass import *
 from utils.embed_subtitle import *
 from utils.segment_video import segment_video
+from upload.upload_main import *
 from config import COOKIES_BROWSER, MAX_SEGMENT_DURATION, DOWNLOAD_ROOT, UPLOAD_ROOT
 
 def chinese_title(title, video_path, thumbnail_path, description_path, index=1):
@@ -261,7 +262,7 @@ def process_video(video_url, platform, index=1):
         return False
 
 
-def youtube_playlist_url(playlist_url, platform):
+def youtube_playlist_url(playlist_url, platform, upload=False):
     """下载播放列表中的所有视频"""
     print("🚀 开始批量下载播放列表...")
     video_urls = get_playlist_video_urls(playlist_url)
@@ -271,7 +272,8 @@ def youtube_playlist_url(playlist_url, platform):
     for idx, video_url in enumerate(video_urls, start=1):
         if process_video(video_url, platform, idx):
             success += 1
-
+            if upload:
+                upload_main(platform)
     print(f"\n✅ 批量下载完成！成功 {success}/{len(video_urls)} 个视频。")
 
 

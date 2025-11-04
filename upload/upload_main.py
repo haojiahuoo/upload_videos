@@ -229,24 +229,24 @@ def show_platform_menu():
 def upload_main(platform):
     """主程序"""
     
-    # # 自动上传
-    # upload_sequential(platform)
+    # 自动上传
+    upload_sequential(platform)
     
-    #  手动选择上传
-    # 显示平台选择菜单
-    show_platform_menu()
-    platform_choice = input("请输入平台选择 (1/2/3/4/5): ").strip()
+    # #  手动选择上传
+    # # 显示平台选择菜单
+    # show_platform_menu()
+    # platform_choice = input("请输入平台选择 (1/2/3/4/5): ").strip()
     
-    if platform_choice in ["1", "2", "3", "4"]:
-        # 单个平台，直接上传
-        upload_single_platform(platform_choice, platform)
+    # if platform_choice in ["1", "2", "3", "4"]:
+    #     # 单个平台，直接上传
+    #     upload_single_platform(platform_choice, platform)
     
-    elif platform_choice == "5":
-        # 多个平台顺序上传
-        upload_sequential(platform)
+    # elif platform_choice == "5":
+    #     # 多个平台顺序上传
+    #     upload_sequential(platform)
         
-    else:
-        print("❌ 无效的平台选择")
+    # else:
+    #     print("❌ 无效的平台选择")
 
 # if __name__ == "__main__":
-#     upload_main()
+#     upload_main("youtube")

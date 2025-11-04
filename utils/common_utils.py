@@ -11,6 +11,9 @@ def wait_for_element(driver, by, locator, timeout=60):
     """等待元素出现"""
     return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, locator)))
 
+def wait_for_elements(driver, by, locator):
+    return WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((by, locator)))
+
 def wait_for_element_clickable(driver, by, locator, timeout=60):
     """等待元素可点击"""
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((by, locator)))
@@ -23,6 +26,36 @@ def check_element_exists(driver, by, locator, timeout=5):
     except:
         return False
 
+def wait_for_element_disappear(driver, by, locator, timeout=5, check_visibility=True):
+    """
+    等待元素消失
+    
+    Args:
+        driver: WebDriver实例
+        by: 定位方式
+        locator: 定位器
+        timeout: 超时时间（秒）
+        check_visibility: 是否检查可见性，True-等待元素不可见，False-等待元素从DOM中移除
+    
+    Returns:
+        bool: 元素是否在超时时间内消失
+    """
+    try:
+        if check_visibility:
+            # 等待元素不可见（元素可能仍在DOM中但不可见）
+            WebDriverWait(driver, timeout).until(
+                EC.invisibility_of_element_located((by, locator))
+            )
+        else:
+            # 等待元素从DOM中完全移除
+            WebDriverWait(driver, timeout).until(
+                lambda driver: len(driver.find_elements(by, locator)) == 0
+            )
+        return True
+    except Exception as e:
+        print(f"❌ 等待元素消失失败: {e}")
+        return False
+    
 def clean_title(title):
     # 移除 (数字) 或 (数字-数字) 等前缀
     return re.sub(r'^\(\d+[^)]*\)\s*', '', title).strip()

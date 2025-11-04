@@ -6,6 +6,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from utils.common_utils import *
+
 
 class SmartLoginManager:
     """多平台智能登录管理器（支持快手、B站、抖音）"""
@@ -108,6 +110,7 @@ class SmartLoginManager:
         if not self.is_logged_in():
             print("⚠️ Cookies 可能失效，请手动登录...")
             self.wait_for_manual_login()
+            time.sleep(5)
             self.save_cookies()
         else:
             print("✅ 自动登录成功（Cookies 有效）")
@@ -141,108 +144,39 @@ class SmartLoginManager:
                 # 1) 查找个人中心或头像链接（常见选择器）
                 try:
                     # 头像或个人链接（示例）
-                    if self.driver.find_elements(By.CSS_SELECTOR, "a[href*='space.bilibili.com'], .header-login-info, .user-name"):
+                    if self.driver.find_elements(By.XPATH, "//div[@class='upload-btn no-events']"):
                         return True
+                    else:
+                        return False
                 except Exception:
                     pass
-
-                # 2) URL 检查（上传/个人页/会员页）
-                if "/member" in self.driver.current_url or "space.bilibili.com" in self.driver.current_url:
-                    return True
-
-                # 3) Cookie 检查（常见 cookie，如 `bili_jct` / `DedeUserID` 等）
-                try:
-                    cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-                    if any(k in cookies for k in ("bili_jct", "DedeUserID", "DedeUserID__ckMd5")):
-                        return True
-                except Exception:
-                    pass
-
-                # 最后回退到 page_source 判断（不可靠，作为最后手段）
-                return ("个人中心" in self.driver.page_source) or ("登录" not in self.driver.page_source)
-
             # -----------------------
             # Douyin (抖音) 检测
             # -----------------------
             if self.site_name == "douyin":
-            #     try:
-            #         # 1️⃣ 登录状态检测：查找右上角头像或个人主页入口
-            #         selectors = [
-            #             "div[class*='login-avatar']",
-            #             "div[class*='profile-entry']",
-            #             "img[class*='avatar']",
-            #             "div[class*='user-profile']",
-            #         ]
-            #         for sel in selectors:
-            #             elements = self.driver.find_elements(By.CSS_SELECTOR, sel)
-            #             if elements and elements[0].is_displayed():
-            #                 return True
-            #     except Exception:
-            #         pass
-
-                # # 2️⃣ URL 检查
-                # current_url = self.driver.current_url
-                # if any(x in current_url for x in ["/user/", "/profile", "/creator"]):
-                #     return True
-
-                # # 3️⃣ localStorage 检查（更强）
-                # try:
-                #     user_info = self.driver.execute_script("""
-                #         const keys = Object.keys(localStorage);
-                #         for (let k of keys) {
-                #             if (k.includes('user') || k.includes('profile')) {
-                #                 return localStorage.getItem(k);
-                #             }
-                #         }
-                #         return null;
-                #     """)
-                #     if user_info:
-                #         return True
-                # except Exception:
-                #     pass
-
-                # # 4️⃣ Cookies 检查（只在 URL / 页面上确认未登录时辅助）
-                # try:
-                #     cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-                #     # 抖音登录后会生成一些特殊 cookie
-                #     if "sessionid" in cookies or "passport_csrf_token" in cookies:
-                #         return True
-                # except Exception:
-                #     pass
-
-                # 5️⃣ 最后回退：检测是否仍有“登录”按钮
-                page_source = self.driver.page_source
-                if "登录" in page_source or "login" in page_source:
-                    return False
-                else:
-                    return True
-
-                # return False
-
-
+                try:
+                    # 头像或个人链接（示例）
+                    if check_element_exists(self.driver, By.XPATH, "//span[@class='semi-button-content-right']"):
+                        return True
+                    else:
+                        return False
+                except Exception:
+                    pass
             # -----------------------
             # Kuaishou (快手) 检测
             # -----------------------
             if self.site_name == "kuaishou":
                 try:
                     # 查找个人中心或头像
-                    if self.driver.find_elements(By.CSS_SELECTOR, ".user-info-name"):
+                    if check_element_exists(self.driver, By.XPATH, "//*[@id='joyride-wrapper']/main/section/div/div[1]/div[2]/button"):
                         return True
+                    else:
+                        return False
                 except Exception:
                     pass
-
-                if "/user" in self.driver.current_url or "/profile" in self.driver.current_url:
-                    return True
-
-                try:
-                    cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-                    if any(k in cookies for k in ("kuaishou_app", "ks_user_id")):
-                        return True
-                except Exception:
-                    pass
-
-                return ("立即登录" not in self.driver.page_source)
-
+            # -----------------------
+            # weixin (微信视频号) 检测
+            # -----------------------    
             if self.site_name == "weixin":
                 # 临时调试代码
                 elements = self.driver.find_elements(By.CSS_SELECTOR, "wujie-app")
@@ -251,16 +185,13 @@ class SmartLoginManager:
                     return True
                 else:
                     return False
-
-            # 其他站点默认回退到 page_source
-            return "登录" not in self.driver.page_source
-
+                
         except Exception:
             return False
 
-    def wait_for_manual_login(self, timeout=180):
+    def wait_for_manual_login(self, timeout=300):
         """等待人工登录"""
-        print("⏳ 请手动完成登录（3分钟内），登录后自动检测状态。")
+        print("⏳ 请手动完成登录（5分钟内），登录后自动检测状态。")
         start = time.time()
         while time.time() - start < timeout:
             if self.is_logged_in():

@@ -1,0 +1,179 @@
+{
+    "youtube": {
+        "download": {
+            "E:\\Videos\\temp_01.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=TS5PX9n6QfA": true,
+                "title_cn": "2天SOLO女孩生存在秋天的森林 舒适的热帐篷露营和雨夜ASMR"
+            },
+            "E:\\Videos\\temp_02.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=VzBbH6Yum50": true,
+                "title_cn": "ASMR 单身女孩摩托车露营-森林帐篷和篝火牛排"
+            },
+            "E:\\Videos\\temp_03.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=0XhivXeWgsc": true,
+                "title_cn": "与我的狗独自远足 大雨和舒适帐篷露营（ASMR）"
+            },
+            "E:\\Videos\\temp_04.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=96g6m9JPWw4": true,
+                "title_cn": "3天单人生存女孩露营与热帐篷，钓鱼和湖浴（ASMR）"
+            },
+            "E:\\Videos\\temp_05.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=Z3kFmqY_h9U": true,
+                "title_cn": "与我的狗在野外独处4天 单人洞穴露营与生存挑战 自发性知觉经络反应"
+            },
+            "E:\\Videos\\temp_06.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=dGf9ao_QlFE": true,
+                "title_cn": "斯堪的纳维亚半岛的单身女孩露营出了问题 24小时生存挑战ASMR"
+            },
+            "E:\\Videos\\temp_07.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=5369tcuJltc": true,
+                "title_cn": "在斯堪的纳维亚荒野独自徒步5天单身女孩丛林和篝火烹饪ASMR"
+            },
+            "E:\\Videos\\temp_08.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=-oK736-Qufo": true,
+                "title_cn": "太阳女在雨中捕鱼 森林露营与自然ASMR"
+            },
+            "E:\\Videos\\temp_09.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "https://www.youtube.com/watch?v=-oH20xjQYI8": true,
+                "title_cn": "独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚"
+            }
+        },
+        "upload": {
+            "E:\\Videos\\(01)2天SOLO女孩生存在秋天的森林 舒适的热帐篷露营和雨夜ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "kuaishou": true,
+                "douyin": true,
+                "bilibili": true,
+                "weixin": true
+            },
+            "E:\\Videos\\(02)ASMR 单身女孩摩托车露营-森林帐篷和篝火牛排.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true,
+                "weixin": true
+            },
+            "E:\\Videos\\(03)与我的狗独自远足 大雨和舒适帐篷露营（ASMR）.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(04)3天单人生存女孩露营与热帐篷，钓鱼和湖浴（ASMR）.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(05)与我的狗在野外独处4天 单人洞穴露营与生存挑战 自发性知觉经络反应.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(06)斯堪的纳维亚半岛的单身女孩露营出了问题 24小时生存挑战ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(07)在斯堪的纳维亚荒野独自徒步5天单身女孩丛林和篝火烹饪ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true,
+                "bilibili": true
+            },
+            "E:\\Videos\\(08-1)太阳女在雨中捕鱼 森林露营与自然ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "bilibili": true,
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(08-2)太阳女在雨中捕鱼 森林露营与自然ASMR.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "bilibili": true,
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(09-1)独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true
+            },
+            "E:\\Videos\\(09-2)独自一人在野林中度过两天，周围有狼单身女孩搭建庇护所并度过夜晚.mp4": {
+                "subtitles": {
+                    "vtt": false,
+                    "translate": false
+                },
+                "douyin": true,
+                "kuaishou": true
+            }
+        }
+    }
+}
